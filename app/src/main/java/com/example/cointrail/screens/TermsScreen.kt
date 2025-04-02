@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -34,8 +33,9 @@ import androidx.compose.ui.unit.dp
 import com.example.cointrail.R
 import com.example.cointrail.ui.theme.CoinTrailTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
+import androidx.compose.ui.res.dimensionResource
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +59,7 @@ fun TermsScreen() {
                         onClick = { /* Handle navigation icon click */ }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.emailIcon),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
@@ -76,8 +76,8 @@ fun TermsScreen() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(dimensionResource(id = R.dimen.padding16)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding16))
         ) {
             // Terms Text
             item {
@@ -99,7 +99,7 @@ fun TermsScreen() {
                         text = stringResource(R.string.accept),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.weight(1f) // Push checkbox to the end
+                        modifier = Modifier.weight(1f)
                     )
                     Checkbox(
                         checked = isChecked,

@@ -1,6 +1,5 @@
 package com.example.cointrail.screens
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import com.example.cointrail.R
 import com.example.cointrail.composables.SignInWithGoogleButton
 import com.example.cointrail.ui.theme.CoinTrailTheme
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -72,17 +71,17 @@ fun LoginScreen(
             painter = painterResource(id = R.drawable.icon),
             contentDescription = stringResource(id = R.string.appIcon),
             modifier = Modifier
-                .fillMaxWidth(0.2f)
+                .fillMaxWidth(0.3f)
                 .aspectRatio(1f), // Maintain square aspect ratio
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary) // Apply tertiary color tint
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary)
         )
-        Spacer(modifier = Modifier.height(16.dp)) // Add to sizes.xml
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
         Text(
             text = stringResource(id = R.string.welcomeBack),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.secondary
         )
-        Spacer(modifier = Modifier.height(16.dp)) // Add to sizes.xml
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
 
        //Email input
         OutlinedTextField(
@@ -98,26 +97,26 @@ fun LoginScreen(
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = stringResource(id = R.string.emailIcon),
-                    tint = MaterialTheme.colorScheme.primary // Use primary color for icon
+                    tint = MaterialTheme.colorScheme.primary
                 )
             },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary, // Border color when focused
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant, // Border color when unfocused
-                focusedLabelColor = MaterialTheme.colorScheme.primary, // Label color when focused
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface, // Label color when unfocused
-                cursorColor = MaterialTheme.colorScheme.secondary, // Cursor color
-                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant, // Placeholder color when focused
-                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface // Placeholder color when unfocused
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = MaterialTheme.colorScheme.secondary,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = dimensionResource(id = R.dimen.padding16))
         )
 
-        Spacer(modifier = Modifier.height(16.dp)) // Add to sizes.xml
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
 
-        //Pasword input field
+        //Password input field
 
         OutlinedTextField(
             value = passwordText,
@@ -162,25 +161,25 @@ fun LoginScreen(
             },
             modifier=Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = dimensionResource(id = R.dimen.padding16)),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary, // Border color when focused
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant, // Border color when unfocused
-                focusedLabelColor = MaterialTheme.colorScheme.primary, // Label color when focused
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface, // Label color when unfocused
-                cursorColor = MaterialTheme.colorScheme.secondary, // Cursor color
-                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant, // Placeholder color when focused
-                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface // Placeholder color when unfocused
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = MaterialTheme.colorScheme.secondary,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface
             )
         )
-        Spacer(modifier = Modifier.height(16.dp)) // Add to sizes.xml
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16))) // Add to sizes.xml
 
         Row {
             Text(
                 text = stringResource(id = R.string.forgotPassword),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding16))
             )
             TextButton(
                 onClick = {
@@ -195,16 +194,16 @@ fun LoginScreen(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(16.dp)) // Add to sizes.xml
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16))) // Add to sizes.xml
         SignInWithGoogleButton(onClick = {}, modifier = Modifier)
-        Spacer(modifier = Modifier.height(16.dp)) // Add to sizes.xml
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16))) // Add to sizes.xml
 
         Row{
             Text(
                 text= stringResource(id=R.string.newUser),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding16))
             )
             TextButton(
                 onClick = {

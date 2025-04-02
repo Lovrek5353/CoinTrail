@@ -11,8 +11,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -66,7 +67,7 @@ fun SignUpScreen() {
                         onClick = { /* Handle navigation icon click */ }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.emailIcon),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
@@ -94,7 +95,7 @@ fun SignUpScreen() {
                 )
             }
             item{
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item{
                 OutlinedTextField(
@@ -115,7 +116,7 @@ fun SignUpScreen() {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = dimensionResource(id = R.dimen.padding16))
                 )
             }
             item {
@@ -126,7 +127,7 @@ fun SignUpScreen() {
                 )
             }
             item {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item {
                 OutlinedTextField(
@@ -147,12 +148,12 @@ fun SignUpScreen() {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = dimensionResource(id = R.dimen.padding16))
                 )
 
             }
             item {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item {
                 Text(
@@ -162,7 +163,7 @@ fun SignUpScreen() {
                 )
             }
             item {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item {
                 OutlinedTextField(
@@ -183,11 +184,11 @@ fun SignUpScreen() {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = dimensionResource(id = R.dimen.padding16))
                 )
             }
             item {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item {
                 Text(
@@ -197,7 +198,7 @@ fun SignUpScreen() {
                 )
             }
             item {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item {
                 OutlinedTextField(
@@ -218,7 +219,7 @@ fun SignUpScreen() {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
+                        .padding(horizontal = dimensionResource(id = R.dimen.padding16)),
                     trailingIcon = {
                         IconButton(
                             onClick = {
