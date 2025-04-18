@@ -24,4 +24,15 @@
     <string name="confirmPassword">Confirm your password</string>
     <string name="enterName">Enter your name</string>
     <string name="name">Name</string>
+    <string name="transactionAmount">Transaction amount: </string>
+    <string name="transactionDate">Transaction date: </string>
+    <string name="transactionDescription">Transaction description: </string>
+    <string name="transactionCategory">Transaction category: </string>
+    <string name="transactionType">Transaction type: </string>
+    <string name="add">Add</string>
+    <string name="category">Category</string>
+    <string name="deposit">Deposit</string>
+    <string name="income">Income</string>
+    <string name="expense">Expense</string>
+    <string name="newTransaction">Add new transaction</string>
 </resources>
