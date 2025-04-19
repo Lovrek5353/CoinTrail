@@ -6,7 +6,7 @@ import com.example.cointrail.ui.theme.CoinTrailTheme
 
 @Composable
 fun SavingPocketsScreen(){
-
+    TODO("One below other centered on the screen, row of cards as CategoryScreen, progress bar on each card")
 }
 
 @Preview

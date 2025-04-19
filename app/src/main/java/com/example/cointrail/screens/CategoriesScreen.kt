@@ -38,7 +38,7 @@ fun CategoriesScreen() {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.category),
+                        text = stringResource(id = R.string.categories),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onPrimary
                     )

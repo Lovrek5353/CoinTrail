@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "121529732215",
+    "project_id": "cointrail-c1748",
+    "storage_bucket": "cointrail-c1748.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:121529732215:android:a2752a1cc6cf56306bca72",
+        "android_client_info": {
+          "package_name": "com.example.cointrail"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfdeDKAA3S2Z4QCG-iS4rM_VkwWIhXQ-E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
