@@ -9,3 +9,51 @@ val dummyCategories = listOf(
     Category(id = "6", name = "Health", description = "Medical expenses and insurance."),
     Category(id = "7", name = "Travel", description = "Vacations, flights, hotels.")
 )
+
+val dummyUser = User(
+    id = "user123",
+    name = "John Doe",
+    email = "john.doe@example.com"
+)
+
+val dummySavingPocket = SavingPocket(
+    id = "pocket123",
+    name = "Vacation Fund",
+    description = "Saving up for a summer trip to Europe.",
+    userId = "user456",
+    balance = 1500.0,
+    targetAmount = 3000.0,
+    targetDate = "2025-08-01"
+)
+
+val dummySavingPocket1 = SavingPocket(
+    id = "pocket123",
+    name = "Vacation Fund",
+    description = "Saving up for a summer trip to Europe.",
+    userId = "user456",
+    balance = 1500.0,
+    targetAmount = 3000.0,
+    targetDate = "2025-08-01"
+)
+
+val dummySavingPocket2 = SavingPocket(
+    id = "pocket124",
+    name = "Emergency Fund",
+    description = "Saving for unexpected expenses.",
+    userId = "user456",
+    balance = 2000.0,
+    targetAmount = 5000.0,
+    targetDate = "2025-12-31"
+)
+
+val dummySavingPocket3 = SavingPocket(
+    id = "pocket125",
+    name = "Car Fund",
+    description = "Saving to buy a new car.",
+    userId = "user456",
+    balance = 1000.0,
+    targetAmount = 10000.0,
+    targetDate = "2026-06-01"
+)
+
+val savingPocketsList = listOf(dummySavingPocket1, dummySavingPocket2, dummySavingPocket3)

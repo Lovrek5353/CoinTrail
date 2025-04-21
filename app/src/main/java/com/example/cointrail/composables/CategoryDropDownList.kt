@@ -1,8 +1,14 @@
 package com.example.cointrail.composables
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.MoreVert
@@ -10,14 +16,19 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,17 +40,18 @@ import com.example.cointrail.ui.theme.CoinTrailTheme
 @Composable
 fun CategoryDropDownList(
     items: List<Category>,
-    //onItemSelected: (Category) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf<Category?>(null) } // Start with no selection
+    var selectedItem by remember { mutableStateOf<Category?>(null) }
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
 
     Box(modifier = Modifier.padding(16.dp)) {
         TextField(
-            value = selectedItem?.name ?: "", // Show selected item name or empty if none
+            value = selectedItem?.name ?: "",
             onValueChange = {},
             readOnly = true,
-            placeholder = { Text(stringResource(R.string.category)) }, // Show "Category" when nothing is selected
+            placeholder = { Text(stringResource(R.string.category)) },
             trailingIcon = {
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
@@ -51,23 +63,37 @@ fun CategoryDropDownList(
             modifier = Modifier.fillMaxWidth()
         )
 
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            items.forEach { item ->
-                DropdownMenuItem(
-                    text = { Text(item.name) },
-                    onClick = {
-                        selectedItem = item // Update selected item
-                        //onItemSelected(item) // Notify parent of selection
-                        expanded = false // Close dropdown
+        if (expanded) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.6f))
+                    .blur(radius = 16.dp) // Android 12+ only
+                    .clickable { expanded = false }
+            ) {
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier
+                        .width(IntrinsicSize.Max)
+                        .offset(y = 60.dp) // Adjust based on your TextField height
+                ) {
+                    items.forEach { item ->
+                        DropdownMenuItem(
+                            text = { Text(item.name) },
+                            onClick = {
+                                selectedItem = item
+                                expanded = false
+                            }
+                        )
                     }
-                )
+                }
             }
         }
     }
 }
+
+
 
 
 @Preview

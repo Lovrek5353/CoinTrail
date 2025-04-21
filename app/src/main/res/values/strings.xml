@@ -38,4 +38,10 @@
     <string name="newTransaction">Add new transaction</string>
     <string name="backIcon">Back icon</string>
     <string name="settingsIcon">Settings icon</string>
+    <string name="profile">Profile</string>
+    <string name="profile_icon">Profile icon</string>
+    <string name="edit_name">Edit your name</string>
+    <string name="newCategory">Add new category</string>
+    <string name="categoryName">"Category name: "</string>
+    <string name="categoryDescription">"Category description: "</string>
 </resources>
