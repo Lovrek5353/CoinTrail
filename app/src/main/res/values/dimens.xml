@@ -4,4 +4,5 @@
     <dimen name="padding24">24dp</dimen>
     <dimen name="padding112">122dp</dimen>
     <dimen name="padding56">56dp</dimen>
+    <dimen name="button_height">32.dp</dimen>
 </resources>

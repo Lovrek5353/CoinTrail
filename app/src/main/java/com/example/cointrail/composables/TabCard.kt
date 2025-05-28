@@ -2,26 +2,34 @@ package com.example.cointrail.composables
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cointrail.data.SavingPocket
-import com.example.cointrail.data.dummySavingPocket
+import com.example.cointrail.data.Tab
+import com.example.cointrail.data.dummyTab
+import com.example.cointrail.ui.theme.CoinTrailTheme
 
 @Composable
-fun SavingPocketCard(
-    savingPocket: SavingPocket,
+fun TabCard(
+    tab: Tab,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
-) {
-    val progress = if (savingPocket.targetAmount > 0)
-        (savingPocket.balance / savingPocket.targetAmount).coerceIn(0.0, 1.0).toFloat()
+){
+    val progress = if (tab.outstandingBalance > 0)
+        (tab.outstandingBalance / tab.initialAmount).coerceIn(0.0, 1.0).toFloat()
     else 0f
 
     Surface(
@@ -42,7 +50,7 @@ fun SavingPocketCard(
                 .padding(16.dp)
         ) {
             Text(
-                text = savingPocket.name,
+                text = tab.name,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant // Use onSurfaceVariant for text
             )
@@ -62,7 +70,7 @@ fun SavingPocketCard(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "${savingPocket.balance} / ${savingPocket.targetAmount}",
+                text = "${tab.outstandingBalance} / ${tab.initialAmount}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -70,17 +78,14 @@ fun SavingPocketCard(
     }
 }
 
-@Preview()
+
+@Preview
 @Composable
-fun SavingPocketCardPreview() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        SavingPocketCard(
-            savingPocket = dummySavingPocket,
-            modifier = Modifier.fillMaxWidth(0.75f),
-            onClick = {}
+fun TabCardPreview(){
+    CoinTrailTheme {
+        TabCard(
+            tab= dummyTab,
+            onClick = {},
         )
     }
 }

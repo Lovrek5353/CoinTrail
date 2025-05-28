@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,13 +41,15 @@ import com.example.cointrail.ui.theme.CoinTrailTheme
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TabEditorScreen() {
+
+//Same as transaction editor, opens from main screen to add a new transaction that can be saving pocket or tab or category
+fun MainTransactionEditor() {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.newTab),
+                        text = stringResource(id = R.string.newTransaction),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -59,7 +60,7 @@ fun TabEditorScreen() {
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.backIcon),
+                            contentDescription = stringResource(id = R.string.emailIcon),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -79,7 +80,7 @@ fun TabEditorScreen() {
         ) {
             item {
                 Text(
-                    text = stringResource(id = R.string.tabAmount),
+                    text = stringResource(id = R.string.transactionAmount),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -91,8 +92,8 @@ fun TabEditorScreen() {
                 OutlinedTextField(
                     value = "",
                     onValueChange = { /* Handle value change */ },
-                    label = { Text(text = stringResource(id = R.string.tabAmount)) },
-                    placeholder = { Text(text = stringResource(id = R.string.tabAmount)) },
+                    label = { Text(text = stringResource(id = R.string.transactionAmount)) },
+                    placeholder = { Text(text = stringResource(id = R.string.transactionAmount)) },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         capitalization = KeyboardCapitalization.None,
                         keyboardType = KeyboardType.Number
@@ -159,26 +160,95 @@ fun TabEditorScreen() {
                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item {
-                Button(
-                    onClick = { /* Handle save click */ },
+                Text(
+                    text = stringResource(id = R.string.transactionType),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
+            }
+            item {
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth(2f / 3f) // 2/3 of the parent width
-                        .aspectRatio(5f) // width:height ratio, so height = width/3
+                        .fillMaxWidth()
+                        .padding(dimensionResource(id = R.dimen.padding16)),
+                    contentAlignment = Alignment.Center
                 ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.income),
+                            modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding16))
+                        )
+                        RadioButton(
+                            selected = true,
+                            onClick = { /* Handle selection */ }
+                        )
+                        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding16))) // Horizontal spacing
+                        Text(
+                            text = stringResource(id = R.string.expense),
+                            modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding16))
+                        )
+                        RadioButton(
+                            selected = false,
+                            onClick = { /* Handle selection */ }
+                        )
+                    }
+                }
+            }
+            item{
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
+            }
+            item{
+                Text(
+                    text = stringResource(id = R.string.transactionSavingPocket),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+            item{
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
+            }
+            item{
+                //saving pocket drop down
+            }
+            item{
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
+            }
+            item{
+                Text(
+                    text = stringResource(id = R.string.transactionTab),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+            item{
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
+            }
+            item{
+                //tabs drop down
+            }
+            item{
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
+            }
+            item {
+                Button(onClick = { /* Handle save click */ })
+                {
                     Text(text = stringResource(id = R.string.add))
                 }
-
             }
+
         }
     }
 }
 
-
 @Preview
 @Composable
-
-fun TabEditorScreenPreview() {
+fun MainTransactionEditorPreview() {
     CoinTrailTheme {
-        TabEditorScreen()
+        MainTransactionEditor()
     }
 }

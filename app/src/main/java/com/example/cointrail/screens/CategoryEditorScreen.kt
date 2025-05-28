@@ -1,13 +1,10 @@
-package com.example.cointrail.screens
-
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -15,14 +12,39 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
 import com.example.cointrail.ui.theme.CoinTrailTheme
+import kotlinx.coroutines.flow.collectLatest
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoryEditorScreen() {
+fun CategoryEditorScreen(
+    viewModel: CategoriesViewModel,
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Collect ViewModel events for Snackbar and navigation
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is CategoriesViewModel.UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(event.message)
+                }
+                CategoriesViewModel.UiEvent.SubmissionSuccess -> {
+                    navController.popBackStack()
+                }
+
+                else -> {}
+            }
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -34,7 +56,7 @@ fun CategoryEditorScreen() {
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = { /* Handle navigation icon click */ }
+                        onClick = { navController.popBackStack() }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -47,7 +69,8 @@ fun CategoryEditorScreen() {
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             )
-        }
+        },
+        modifier = modifier
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
@@ -56,10 +79,8 @@ fun CategoryEditorScreen() {
                 .padding(horizontal = dimensionResource(id = R.dimen.padding16)),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
-        )  {
-            item {
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
-            }
+        ) {
+            item { Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16))) }
             item {
                 Text(
                     text = stringResource(id = R.string.categoryName),
@@ -70,8 +91,8 @@ fun CategoryEditorScreen() {
             }
             item {
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = { /* Handle value change */ },
+                    value = viewModel.category.name,
+                    onValueChange = viewModel::onNameChanged,
                     label = { Text(text = stringResource(id = R.string.categoryName)) },
                     placeholder = { Text(text = stringResource(id = R.string.categoryName)) },
                     keyboardOptions = KeyboardOptions.Default.copy(
@@ -80,12 +101,9 @@ fun CategoryEditorScreen() {
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(dimensionResource(id = R.dimen.padding56))
                 )
             }
-            item {
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
-            }
+            item { Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16))) }
             item {
                 Text(
                     text = stringResource(id = R.string.categoryDescription),
@@ -96,8 +114,8 @@ fun CategoryEditorScreen() {
             }
             item {
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = { /* Handle value change */ },
+                    value = viewModel.category.description,
+                    onValueChange = viewModel::onDescriptionChanged,
                     label = { Text(text = stringResource(id = R.string.categoryDescription)) },
                     placeholder = { Text(text = stringResource(id = R.string.categoryDescription)) },
                     modifier = Modifier
@@ -105,12 +123,10 @@ fun CategoryEditorScreen() {
                         .height(dimensionResource(id = R.dimen.padding112))
                 )
             }
-            item {
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding24)))
-            }
+            item { Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding24))) }
             item {
                 Button(
-                    onClick = { /* Handle save click */ },
+                    onClick = { viewModel.onSubmit() },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = stringResource(id = R.string.add))
@@ -120,10 +136,13 @@ fun CategoryEditorScreen() {
     }
 }
 
-@Preview
-@Composable
-fun CategoryEditorScreenPreview() {
-    CoinTrailTheme {
-        CategoryEditorScreen()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun CategoryEditorScreenPreview() {
+//    CoinTrailTheme {
+//        CategoryEditorScreen(
+//            viewModel = CategoriesViewModel(),
+//            navController = rememberNavController()
+//        )
+//    }
+//}

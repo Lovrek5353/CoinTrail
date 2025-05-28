@@ -44,4 +44,12 @@
     <string name="newCategory">Add new category</string>
     <string name="categoryName">"Category name: "</string>
     <string name="categoryDescription">"Category description: "</string>
+    <string name="savingPockets">Saving Pockets</string>
+    <string name="tabs">Tab</string>
+    <string name="transactionSavingPocket">"Transaction saving pocket: "</string>
+    <string name="transactionTab">Transaction tab</string>
+    <string name="newTab">Add new tab record</string>
+    <string name="tabAmount">"Tab amount: "</string>
+    <string name="newSavingPocket">Add new saving pocket record</string>
+    <string name="savingAmount">"Saving pocket amount: "</string>
 </resources>

@@ -89,13 +89,13 @@ fun AccountScreen(
                 )
             }
             item {
-                Divider(
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                    thickness = 1.dp,
+                HorizontalDivider(
                     modifier = Modifier.padding(
                         start = dimensionResource(R.dimen.padding16),
                         end = dimensionResource(R.dimen.padding16)
-                    )
+                    ),
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
                 )
             }
             item {

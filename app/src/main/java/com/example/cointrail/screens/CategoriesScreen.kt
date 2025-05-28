@@ -1,6 +1,8 @@
 package com.example.cointrail.screens
 
+import CategoriesViewModel
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -20,19 +22,31 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
 import com.example.cointrail.composables.CategoryCard
+import com.example.cointrail.data.Category
 import com.example.cointrail.data.dummyCategories
+import com.example.cointrail.navigation.Screen
+import com.example.cointrail.repository.RepositoryImpl
 import com.example.cointrail.ui.theme.CoinTrailTheme
+import com.example.cointrail.viewModels.MainViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoriesScreen() {
+fun CategoriesScreen(
+    viewModel: CategoriesViewModel,
+    navController: NavController,
+) {
+    val categoryList by viewModel.fetchCategories().collectAsState(initial = emptyList())
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -45,7 +59,7 @@ fun CategoriesScreen() {
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = { /* Handle navigation icon click */ }
+                        onClick = { navController.popBackStack() }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -59,9 +73,9 @@ fun CategoriesScreen() {
                 )
             )
         },
-        floatingActionButton = {
+        floatingActionButton = { //navigate to CategoryScreen editor
             FloatingActionButton(onClick = {
-                // Handle FAB click
+                navController.navigate(Screen.CategoryEditorScreen.route)
             }) {
                 Icon(Icons.Filled.Add, contentDescription = "Add")
             }
@@ -72,11 +86,12 @@ fun CategoriesScreen() {
             columns = GridCells.Fixed(2),
             modifier = Modifier.padding(innerPadding).padding(16.dp)
         ) {
-            items(dummyCategories) { category ->
+            items(categoryList) { category ->
                 CategoryCard(
                     category = category,
                     onClick = {
-                        println("Clicked on ${category.name}")
+                        Log.d("CategoriesScreen", "Navigating to CategoryScreen with id: ${category.id}")
+                        navController.navigate(Screen.CategoryScreen.createRoute(category.id))
                     }
                 )
             }
@@ -87,7 +102,12 @@ fun CategoriesScreen() {
 @Preview
 @Composable
 fun CategoriesScreenPreview() {
+    val navController = rememberNavController()
+    val viewModel = CategoriesViewModel(repository = RepositoryImpl()) // Use a mock if your VM has dependencies
     CoinTrailTheme {
-        CategoriesScreen()
+        CategoriesScreen(
+            navController = navController,
+            viewModel = viewModel
+        )
     }
 }

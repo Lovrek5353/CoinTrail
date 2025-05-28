@@ -1,0 +1,111 @@
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.cointrail.data.Category
+import com.example.cointrail.data.Transaction
+import com.example.cointrail.data.User
+import com.example.cointrail.repository.Repository
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+
+class CategoriesViewModel(
+    private val repository: Repository  // Inject repository via constructor
+) : ViewModel() {
+
+    // Observe the current user reactively
+    val user: StateFlow<User?> = repository.currentUser
+
+    // Form state
+    var category by mutableStateOf(Category())
+        private set
+
+    // UI event flow for Snackbar/navigation
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
+    fun onSubmit() {
+        viewModelScope.launch {
+            try {
+                // Always get the latest user value
+                val currentUser = user.value
+                val userId = currentUser?.id ?: run {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("User not logged in"))
+                    return@launch
+                }
+
+                // Create a copy of the category with the userId
+                val categoryToSave = category.copy(userId = userId)
+
+                // Validate fields
+                if (categoryToSave.name.isBlank()) {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Category name required"))
+                    return@launch
+                }
+                if (categoryToSave.description.isBlank()) {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Category description required"))
+                    return@launch
+                }
+
+                // Save to repository
+                repository.addCategory(categoryToSave)
+
+                // Reset the form and notify UI
+                category = Category()
+                _eventFlow.emit(UiEvent.SubmissionSuccess)
+
+            } catch (e: Exception) {
+                val errorMessage = "Error saving category: ${e.message ?: "Unknown error"}"
+                _eventFlow.emit(UiEvent.ShowSnackbar(errorMessage))
+            }
+        }
+    }
+
+    fun onNameChanged(newName: String) {
+        category = category.copy(name = newName)
+    }
+
+    fun onDescriptionChanged(newDescription: String) {
+        category = category.copy(description = newDescription)
+    }
+
+    fun fetchCategories(): SharedFlow<List<Category>> {
+        return repository.getCategories()
+    }
+
+    private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
+    val transactions: StateFlow<List<Transaction>> = _transactions
+
+    fun observeCategoryTransactions(categoryId: String) {
+        viewModelScope.launch {
+            repository.getCategoryTransactions(categoryId)
+                .collectLatest { txList ->
+                    _transactions.value = txList
+                }
+        }
+    }
+
+    private val _category = MutableStateFlow<Category?>(null)
+    val singleCategory: MutableStateFlow<Category?> = _category
+
+    fun fetchCategory(categoryId: String) {
+        viewModelScope.launch {
+            repository.getCategory(categoryId)
+                .collectLatest { category ->
+                    _category.value = category
+                }
+        }
+    }
+
+
+    sealed class UiEvent {
+        data class ShowSnackbar(val message: String) : UiEvent()
+        object SubmissionSuccess : UiEvent()
+    }
+}

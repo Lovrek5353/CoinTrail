@@ -2,7 +2,7 @@ package com.example.cointrail.data
 
 import com.google.firebase.firestore.DocumentId
 
-data class Loan(
+data class Tab(
     @DocumentId var id: String = "",
     var name: String = "",
     var description: String = "",

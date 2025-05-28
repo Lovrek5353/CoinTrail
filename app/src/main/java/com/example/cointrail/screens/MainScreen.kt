@@ -11,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
@@ -19,6 +18,8 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,13 +31,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
+import com.example.cointrail.navigation.Screen
+import com.example.cointrail.repository.RepositoryImpl
 import com.example.cointrail.ui.theme.CoinTrailTheme
+import com.example.cointrail.viewModels.LoginViewModel
+import com.example.cointrail.viewModels.MainViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(){
+fun MainScreen(
+    viewModel: MainViewModel,
+    navController: NavController,
+) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -81,7 +91,7 @@ fun MainScreen(){
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    IconButton(onClick = { /* Navigate to Home */ }) { //navigate to categories
+                    IconButton(onClick = { navController.navigate(Screen.CategoriesScreen.route) }) { //navigate to categories
                         Icon(
                             imageVector = Icons.Filled.Menu,
                             contentDescription = "temp1"
@@ -113,8 +123,15 @@ fun MainScreen(){
                     }
                 }
             }
-
-        }
+        },
+        floatingActionButton = { //navigate to main transaction editor
+            FloatingActionButton(onClick = {
+                navController.navigate(Screen.CategoryEditorScreen.route)
+            }) {
+                Icon(Icons.Filled.Add, contentDescription = "Add")
+            }
+        },
+        floatingActionButtonPosition = FabPosition.End // Or FabPosition.Center
     ) { innerPadding ->
         Row(
             modifier = Modifier.padding(innerPadding)
@@ -132,8 +149,15 @@ fun MainScreen(){
 
 @Preview
 @Composable
-fun MainScreenPreview(){
+fun MainScreenPreview() {
+    val navController = rememberNavController()
+    val viewModel =
+        MainViewModel(repository = RepositoryImpl()) // Use a mock if your VM has dependencies
+
     CoinTrailTheme {
-        MainScreen()
+        MainScreen(
+            viewModel = viewModel,
+            navController = navController
+        )
     }
 }

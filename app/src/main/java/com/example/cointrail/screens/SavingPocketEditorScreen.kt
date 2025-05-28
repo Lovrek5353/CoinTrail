@@ -2,15 +2,11 @@ package com.example.cointrail.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -22,7 +18,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -42,13 +37,13 @@ import com.example.cointrail.ui.theme.CoinTrailTheme
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TabEditorScreen() {
+fun SavingPocketEditorScreen(){
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.newTab),
+                        text = stringResource(id = R.string.newSavingPocket),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -79,7 +74,7 @@ fun TabEditorScreen() {
         ) {
             item {
                 Text(
-                    text = stringResource(id = R.string.tabAmount),
+                    text = stringResource(id = R.string.savingAmount),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -91,8 +86,8 @@ fun TabEditorScreen() {
                 OutlinedTextField(
                     value = "",
                     onValueChange = { /* Handle value change */ },
-                    label = { Text(text = stringResource(id = R.string.tabAmount)) },
-                    placeholder = { Text(text = stringResource(id = R.string.tabAmount)) },
+                    label = { Text(text = stringResource(id = R.string.savingAmount)) },
+                    placeholder = { Text(text = stringResource(id = R.string.savingAmount)) },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         capitalization = KeyboardCapitalization.None,
                         keyboardType = KeyboardType.Number
@@ -173,12 +168,10 @@ fun TabEditorScreen() {
     }
 }
 
-
 @Preview
 @Composable
-
-fun TabEditorScreenPreview() {
+fun SavingPocketEditorScreenPreview(){
     CoinTrailTheme {
-        TabEditorScreen()
+        SavingPocketEditorScreen()
     }
 }

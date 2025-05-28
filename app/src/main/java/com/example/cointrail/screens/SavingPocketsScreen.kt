@@ -49,7 +49,7 @@ fun SavingPocketsScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.categories),
+                        text = stringResource(id = R.string.savingPockets),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
