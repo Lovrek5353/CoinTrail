@@ -1,5 +1,6 @@
 package com.example.cointrail.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,17 +42,25 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.cointrail.R
 import com.example.cointrail.composables.SignInWithGoogleButton
+import com.example.cointrail.navigation.Screen
 import com.example.cointrail.ui.theme.CoinTrailTheme
+import com.example.cointrail.viewModels.LoginViewModel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: LoginViewModel,
+    navController: NavController,
 ) {
 
     var emailText by remember { mutableStateOf("") }
     var passwordText by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = modifier
@@ -137,19 +147,19 @@ fun LoginScreen(
                 IconButton(
                     onClick = {
                         //try to login and if sucessfully, navigate to next display
-                        //                        coroutineScope.launch {
-/*                            try {
-                                val result = viewModel.emailLogin(usernameText, passwordText).first()
+                   coroutineScope.launch {
+                         try {
+                                val result = viewModel.emailLogin(emailText, passwordText).first()
                                 if (result.isSuccess) {
                                     Log.d("Login", "Successful login")
-                                    navController.navigate(Screen.Orders.route)
+                                    navController.navigate(Screen.MainScreen.route)
                                 } else {
                                     Log.d("Login", "Login failed")
                                 }
                             } catch (e: Exception) {
                                 Log.e("LoginError", "Error logging in", e)
                             }
-                        }*/
+                        }
                     },
                     enabled = emailText.isNotEmpty() && passwordText.isNotEmpty()
                 ) {
@@ -225,7 +235,7 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview(){
     CoinTrailTheme {
-        LoginScreen()
+        //LoginScreen()
     }
 
 }

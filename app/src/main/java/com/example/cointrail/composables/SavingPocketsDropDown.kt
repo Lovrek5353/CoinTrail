@@ -9,17 +9,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,15 +32,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cointrail.R
 import com.example.cointrail.data.Category
-import com.example.cointrail.data.dummyCategories
+import com.example.cointrail.data.SavingPocket
+import com.example.cointrail.data.savingPocketsList
 import com.example.cointrail.ui.theme.CoinTrailTheme
 
 @Composable
-fun CategoryDropDownList(
-    items: List<Category>,
-) {
+
+fun SavingPocketDropDown(
+    items: List<SavingPocket>
+){
     var expanded by remember { mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf<Category?>(null) }
+    var selectedItem by remember { mutableStateOf<SavingPocket?>(null) }
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
 
@@ -56,7 +56,7 @@ fun CategoryDropDownList(
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = "Open category dropdown"
+                        contentDescription = "Open saving pocket dropdown"
                     )
                 }
             },
@@ -91,15 +91,15 @@ fun CategoryDropDownList(
             }
         }
     }
+
 }
-
-
-
 
 @Preview
 @Composable
-fun CategoryDropDownListPreview(){
+fun SavingPocketDropDownPreview(){
     CoinTrailTheme {
-        CategoryDropDownList(dummyCategories)
+        SavingPocketDropDown(
+            items= savingPocketsList
+        )
     }
 }

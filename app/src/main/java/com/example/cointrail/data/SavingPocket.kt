@@ -8,5 +8,6 @@ data class SavingPocket(
     var description: String = "",
     var userId: String = "",
     var balance: Double = 0.0,
-    var targetAmount: Double = 0.0
+    var targetAmount: Double = 0.0,
+    var targetDate: String = ""
 )
