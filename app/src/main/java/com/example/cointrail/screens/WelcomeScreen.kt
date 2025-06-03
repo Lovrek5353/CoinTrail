@@ -36,7 +36,7 @@ fun WelcomeScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background( //Testirati ovo ima li smisla
+            .background(
                 brush = Brush.linearGradient(
                     listOf(
                         MaterialTheme.colorScheme.background,

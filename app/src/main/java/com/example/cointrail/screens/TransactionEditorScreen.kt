@@ -42,7 +42,7 @@ import com.example.cointrail.ui.theme.CoinTrailTheme
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TransactionEditorScreen(){   //nesto u stilu upisa kartice
+fun TransactionEditorScreen(){
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -74,8 +74,8 @@ fun TransactionEditorScreen(){   //nesto u stilu upisa kartice
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.Center, // Centers items vertically
-            horizontalAlignment = Alignment.CenterHorizontally // Centers
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         )  {
             item{
                 Text(
@@ -183,7 +183,7 @@ fun TransactionEditorScreen(){   //nesto u stilu upisa kartice
                             selected = true,
                             onClick = { /* Handle selection */ }
                         )
-                        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding16))) // Horizontal spacing
+                        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding16)))
                         Text(
                             text = stringResource(id = R.string.expense),
                             modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding16))

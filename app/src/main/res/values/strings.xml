@@ -52,4 +52,12 @@
     <string name="tabAmount">"Tab amount: "</string>
     <string name="newSavingPocket">Add new saving pocket record</string>
     <string name="savingAmount">"Saving pocket amount: "</string>
+    <string name="categoryDropdown">Open category dropdown</string>
+    <string name="savinPocketDropDown">Open savings pocket dropdown</string>
+    <string name="savingPocketDropdown">Open savings pocket dropdown</string>
+    <string name="Date">Date</string>
+    <string name="amount">Amount</string>
+    <string name="addCategory">Add new category</string>
+    <string name="addTransaction">Add new transaction</string>
+    <string name="addCTab">Add new tab</string>
 </resources>

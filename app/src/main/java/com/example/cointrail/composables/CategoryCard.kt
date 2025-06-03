@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.ui.res.dimensionResource
+import com.example.cointrail.R
 import com.example.cointrail.data.Category
 import com.example.cointrail.data.dummyCategories
 import com.example.cointrail.ui.theme.CoinTrailTheme
@@ -24,31 +26,31 @@ import com.example.cointrail.ui.theme.CoinTrailTheme
 @Composable
 fun CategoryCard(
     category: Category,
-    modifier: Modifier = Modifier, // Allow external modifiers for flexibility
-    onClick: () -> Unit // Callback for click events
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
 ) {
     Surface(
         modifier = modifier
-            .padding(8.dp) // Add spacing around the card
+            .padding(dimensionResource(R.dimen.padding8))
             .border(
-                width = 1.dp,
+                width = dimensionResource(R.dimen.padding1),
                 color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(24.dp) // Rounded corners for the border
+                shape = RoundedCornerShape(dimensionResource(R.dimen.round24))
             )
-            .clickable { onClick() }, // Add click handling here
-        shape = RoundedCornerShape(24.dp), // Shape of the card itself (matches border)
-        color = MaterialTheme.colorScheme.surface // Background color of the card
+            .clickable { onClick() },
+        shape = RoundedCornerShape(dimensionResource(R.dimen.round24)),
+        color = MaterialTheme.colorScheme.surface
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp), // Padding inside the card
-            contentAlignment = Alignment.Center // Center the text inside the box
+                .padding(dimensionResource(R.dimen.padding16)),
+            contentAlignment = Alignment.Center
         ) {
             Text(
                 text = category.name,
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface // Text color based on theme
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -59,14 +61,14 @@ fun CategoryCard(
 fun CategoryCardPreview() {
     CoinTrailTheme {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2), // Two columns in the grid layout
-            modifier = Modifier.padding(16.dp)
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.padding(dimensionResource(R.dimen.padding16))
         ) {
             items(dummyCategories) { category ->
                 CategoryCard(
                     category = category,
                     onClick = {
-                        // Handle click event here (e.g., print to log or navigate)
+                        // Update to real event
                         println("Clicked on ${category.name}")
                     }
                 )

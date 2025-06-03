@@ -1,11 +1,14 @@
 package com.example.cointrail.screens
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.cointrail.ui.theme.CoinTrailTheme
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    modifier: Modifier = Modifier
+) {
     TODO("Screen used to configure basic application settings, main currency, alerts, etc. It needs to be able to enable different modules of the application")
 }
 

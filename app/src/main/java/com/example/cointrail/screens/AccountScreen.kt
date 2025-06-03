@@ -1,3 +1,5 @@
+package com.example.cointrail.screens
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -65,12 +67,12 @@ fun AccountScreen(
                     contentDescription = stringResource(R.string.profile_icon),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
-                        .size(96.dp)
+                        .size(dimensionResource(R.dimen.padding96))
                         .background(
                             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                             shape = MaterialTheme.shapes.extraLarge
                         )
-                        .padding(16.dp)
+                        .padding(dimensionResource(R.dimen.padding16))
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding16)))
             }
@@ -94,7 +96,7 @@ fun AccountScreen(
                         start = dimensionResource(R.dimen.padding16),
                         end = dimensionResource(R.dimen.padding16)
                     ),
-                    thickness = 1.dp,
+                    thickness = dimensionResource(R.dimen.padding1),
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
                 )
             }
@@ -111,7 +113,7 @@ fun AccountScreen(
                         )
                 )
             }
-            // Name row with edit icon
+
             item {
                 Row(
                     modifier = Modifier
@@ -131,7 +133,7 @@ fun AccountScreen(
                     )
                     IconButton(
                         onClick = onNameEditClick,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(dimensionResource(R.dimen.padding24))
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,

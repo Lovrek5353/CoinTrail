@@ -4,5 +4,20 @@
     <dimen name="padding24">24dp</dimen>
     <dimen name="padding112">122dp</dimen>
     <dimen name="padding56">56dp</dimen>
-    <dimen name="button_height">32.dp</dimen>
+    <dimen name="button_height">32dp</dimen>
+    <dimen name="padding16">16dp</dimen>
+    <dimen name="padding1">1dp</dimen>
+    <dimen name="round24">24dp</dimen>
+    <dimen name="offset60">60dp</dimen>
+    <dimen name="height12">12dp</dimen>
+    <dimen name="round4">4dp</dimen>
+    <dimen name="height4">4dp</dimen>
+    <dimen name="height54">54dp</dimen>
+    <dimen name="clip4">4dp</dimen>
+    <dimen name="padding2">2dp</dimen>
+    <dimen name="round12">12dp</dimen>
+    <dimen name="padding12">12dp</dimen>
+    <dimen name="padding6">6dp</dimen>
+    <dimen name="padding96">96dp</dimen>
+    <dimen name="padding50">50dp</dimen>
 </resources>

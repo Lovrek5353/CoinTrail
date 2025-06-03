@@ -2,6 +2,7 @@ package com.example.cointrail.repository
 
 import android.util.Log
 import com.example.cointrail.data.Category
+import com.example.cointrail.data.SavingPocket
 import com.example.cointrail.data.Tab
 import com.example.cointrail.data.Transaction
 import com.example.cointrail.data.User
@@ -48,7 +49,31 @@ internal class RepositoryImpl
 
 
     override fun getAllTransactions(): SharedFlow<List<Transaction>> {
-        TODO("Not yet implemented")
+        val calendar= Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR,-60)
+        val date=Timestamp(calendar.time)
+
+        val flow=callbackFlow<List<Transaction>>{
+            val query=db.collection("transaction")
+                .whereGreaterThanOrEqualTo("date",date)
+
+            val registration=query.addSnapshotListener{value, error ->
+                if(error!=null){
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val transactions = value?.documents?.mapNotNull { doc ->
+                    doc.toObject(Transaction::class.java)
+                } ?: emptyList()
+                trySend(transactions)
+            }
+            awaitClose { registration.remove() }
+        }
+        return flow.shareIn(
+            scope = CoroutineScope(Dispatchers.IO),
+            started = SharingStarted.WhileSubscribed(),
+            replay = 1
+        )
     }
 
     override fun getTransactions(): SharedFlow<List<Transaction>> {
@@ -64,7 +89,7 @@ internal class RepositoryImpl
         calendar.add(Calendar.DAY_OF_YEAR, -60)
         val date = Timestamp(calendar.time)
 
-        val flow = callbackFlow<List<Transaction>> {
+        val flow = callbackFlow <List<Transaction>> {
             val query = db.collection("transacitons")
                 .whereEqualTo("categoryId", categoryId)
                 .whereGreaterThanOrEqualTo("date", date)
@@ -237,33 +262,45 @@ internal class RepositoryImpl
         TODO("Not yet implemented")
     }
 
-    // In your UserRepository implementation
+    override fun getSavingPockets(): SharedFlow<List<SavingPocket>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getSavingPocket(pocketID: String): SharedFlow<SavingPocket> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun addSavingPocket(savingPocket: SavingPocket) {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateSavingPocket(savingPocket: SavingPocket) {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteSavingPocket(savingPocket: SavingPocket) {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun fetchUserByEmail(email: String) {
         try {
-            // 1. Query Firestore for user by email
             val querySnapshot = usersReference
                 .whereEqualTo("email", email)
                 .get()
-                .await() // Wait for the single query result
+                .await()
 
-            // 2. Handle results
             if (querySnapshot.isEmpty) {
                 throw NoSuchElementException("User with email $email not found")
             }
 
-            // 3. Convert first matching document to User object
             val user = querySnapshot.documents.first().toObject<User>()
                 ?: throw NullPointerException("User data corrupted")
 
-            // 4. Update repository state
             _currentUser.value = user
 
         } catch (e: Exception) {
-            // 5. Handle errors and rethrow for ViewModel
             Log.e("UserRepository", "Error fetching user", e)
             throw e
         }
     }
-
-
 }

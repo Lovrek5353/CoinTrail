@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
+import com.example.cointrail.repository.RepositoryImpl
 import com.example.cointrail.ui.theme.CoinTrailTheme
 import kotlinx.coroutines.flow.collectLatest
 
@@ -27,7 +28,6 @@ fun CategoryEditorScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Collect ViewModel events for Snackbar and navigation
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
@@ -136,13 +136,13 @@ fun CategoryEditorScreen(
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun CategoryEditorScreenPreview() {
-//    CoinTrailTheme {
-//        CategoryEditorScreen(
-//            viewModel = CategoriesViewModel(),
-//            navController = rememberNavController()
-//        )
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun CategoryEditorScreenPreview() {
+    CoinTrailTheme {
+        CategoryEditorScreen(
+            viewModel = CategoriesViewModel(RepositoryImpl()),
+            navController = rememberNavController()
+        )
+    }
+}

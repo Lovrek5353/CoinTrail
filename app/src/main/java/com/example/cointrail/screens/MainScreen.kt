@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -128,10 +129,10 @@ fun MainScreen(
             FloatingActionButton(onClick = {
                 navController.navigate(Screen.CategoryEditorScreen.route)
             }) {
-                Icon(Icons.Filled.Add, contentDescription = "Add")
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.addTransaction))
             }
         },
-        floatingActionButtonPosition = FabPosition.End // Or FabPosition.Center
+        floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
         Row(
             modifier = Modifier.padding(innerPadding)
@@ -139,7 +140,7 @@ fun MainScreen(
             Text(
                 text = stringResource(R.string.welcomeBack)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding8)))
             Text(
                 text = stringResource(R.string.name)
             )
@@ -152,7 +153,7 @@ fun MainScreen(
 fun MainScreenPreview() {
     val navController = rememberNavController()
     val viewModel =
-        MainViewModel(repository = RepositoryImpl()) // Use a mock if your VM has dependencies
+        MainViewModel(repository = RepositoryImpl())
 
     CoinTrailTheme {
         MainScreen(

@@ -1,6 +1,7 @@
 package com.example.cointrail.repository
 
 import com.example.cointrail.data.Category
+import com.example.cointrail.data.SavingPocket
 import com.example.cointrail.data.Tab
 import com.example.cointrail.data.Transaction
 import com.example.cointrail.data.User
@@ -38,6 +39,12 @@ interface Repository {
     suspend fun addTab(tab: Tab)
     fun updateTab(tab: Tab)
     fun deleteTab(tab: Tab)
+
+    fun getSavingPockets(): SharedFlow<List<SavingPocket>>
+    fun getSavingPocket(pocketID: String): SharedFlow<SavingPocket>
+    suspend fun addSavingPocket(savingPocket: SavingPocket)
+    fun updateSavingPocket(savingPocket: SavingPocket)
+    fun deleteSavingPocket(savingPocket: SavingPocket)
 
 
     suspend fun fetchUserByEmail(email: String)

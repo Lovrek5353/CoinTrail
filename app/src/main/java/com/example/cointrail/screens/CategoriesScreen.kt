@@ -18,26 +18,22 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
 import com.example.cointrail.composables.CategoryCard
-import com.example.cointrail.data.Category
-import com.example.cointrail.data.dummyCategories
 import com.example.cointrail.navigation.Screen
 import com.example.cointrail.repository.RepositoryImpl
 import com.example.cointrail.ui.theme.CoinTrailTheme
-import com.example.cointrail.viewModels.MainViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,14 +73,14 @@ fun CategoriesScreen(
             FloatingActionButton(onClick = {
                 navController.navigate(Screen.CategoryEditorScreen.route)
             }) {
-                Icon(Icons.Filled.Add, contentDescription = "Add")
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.addCategory))
             }
         },
-        floatingActionButtonPosition = FabPosition.End // Or FabPosition.Center
+        floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            modifier = Modifier.padding(innerPadding).padding(16.dp)
+            modifier = Modifier.padding(innerPadding).padding(dimensionResource(R.dimen.padding16))
         ) {
             items(categoryList) { category ->
                 CategoryCard(
@@ -103,7 +99,7 @@ fun CategoriesScreen(
 @Composable
 fun CategoriesScreenPreview() {
     val navController = rememberNavController()
-    val viewModel = CategoriesViewModel(repository = RepositoryImpl()) // Use a mock if your VM has dependencies
+    val viewModel = CategoriesViewModel(repository = RepositoryImpl())
     CoinTrailTheme {
         CategoriesScreen(
             navController = navController,

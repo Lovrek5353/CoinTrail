@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -100,20 +101,18 @@ fun CategoryScreen(
                     )
                 }
                 item{
-                    Spacer(modifier = Modifier.height(100.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding112)))
                 }
                 item{
                     SpendingHistogramGraph(transactionList.value)
                 }
                 item{
-                    Spacer(modifier = Modifier.height(50.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding50)))
                 }
                 item{
                     TransactionsTable(transactionList.value)
                 }
-                item{
-                    Text("This is a test text")
-                }
+                // add additional details if needed
             }
 
         }

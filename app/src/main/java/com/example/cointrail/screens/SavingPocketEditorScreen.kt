@@ -69,8 +69,8 @@ fun SavingPocketEditorScreen(){
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.Center, // Centers items vertically
-            horizontalAlignment = Alignment.CenterHorizontally // Centers
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
                 Text(
