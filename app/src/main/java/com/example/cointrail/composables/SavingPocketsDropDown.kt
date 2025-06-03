@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.DropdownMenu
@@ -26,12 +25,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cointrail.R
-import com.example.cointrail.data.Category
 import com.example.cointrail.data.SavingPocket
 import com.example.cointrail.data.savingPocketsList
 import com.example.cointrail.ui.theme.CoinTrailTheme
@@ -43,8 +41,6 @@ fun SavingPocketDropDown(
 ){
     var expanded by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<SavingPocket?>(null) }
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
 
     Box(modifier = Modifier.padding(16.dp)) {
         TextField(
@@ -56,7 +52,7 @@ fun SavingPocketDropDown(
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = "Open saving pocket dropdown"
+                        contentDescription = stringResource(R.string.savinPocketDropDown)
                     )
                 }
             },
@@ -68,7 +64,7 @@ fun SavingPocketDropDown(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.6f))
-                    .blur(radius = 16.dp) // Android 12+ only
+                    .blur(radius = dimensionResource(R.dimen.padding16))
                     .clickable { expanded = false }
             ) {
                 DropdownMenu(
@@ -76,7 +72,7 @@ fun SavingPocketDropDown(
                     onDismissRequest = { expanded = false },
                     modifier = Modifier
                         .width(IntrinsicSize.Max)
-                        .offset(y = 60.dp) // Adjust based on your TextField height
+                        .offset(y = dimensionResource(R.dimen.offset60))
                 ) {
                     items.forEach { item ->
                         DropdownMenuItem(

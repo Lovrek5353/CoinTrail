@@ -41,7 +41,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.cointrail.R
 import com.example.cointrail.composables.SignInWithGoogleButton
@@ -73,7 +72,7 @@ fun LoginScreen(
                     )
                 )
             )
-            .padding(16.dp),
+            .padding(dimensionResource(R.dimen.padding16)),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -82,7 +81,7 @@ fun LoginScreen(
             contentDescription = stringResource(id = R.string.appIcon),
             modifier = Modifier
                 .fillMaxWidth(0.3f)
-                .aspectRatio(1f), // Maintain square aspect ratio
+                .aspectRatio(1f), // Square aspect ratio
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary)
         )
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
@@ -146,7 +145,7 @@ fun LoginScreen(
             trailingIcon = {
                 IconButton(
                     onClick = {
-                        //try to login and if sucessfully, navigate to next display
+                        //try to login and if successfully, navigate to next display
                    coroutineScope.launch {
                          try {
                                 val result = viewModel.emailLogin(emailText, passwordText).first()
@@ -182,7 +181,7 @@ fun LoginScreen(
                 unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface
             )
         )
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16))) // Add to sizes.xml
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
 
         Row {
             Text(
@@ -204,9 +203,9 @@ fun LoginScreen(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16))) // Add to sizes.xml
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
         SignInWithGoogleButton(onClick = {}, modifier = Modifier)
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16))) // Add to sizes.xml
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
 
         Row{
             Text(

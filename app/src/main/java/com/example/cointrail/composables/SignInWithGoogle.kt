@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,15 +32,15 @@ fun SignInWithGoogleButton(
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.surface, // Background color for the button
-            contentColor = MaterialTheme.colorScheme.onSurface // Text and icon color
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
         ),
-        shape = MaterialTheme.shapes.medium, // Rounded corners for the button
-        elevation = ButtonDefaults.elevatedButtonElevation(), // Elevation for Material 3 buttons
+        shape = MaterialTheme.shapes.medium,
+        elevation = ButtonDefaults.elevatedButtonElevation(),
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .height(56.dp) // Standard height for a prominent button
+            .padding(horizontal = dimensionResource(R.dimen.padding16))
+            .height(dimensionResource(R.dimen.height54))
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -47,16 +48,16 @@ fun SignInWithGoogleButton(
             modifier = Modifier.fillMaxWidth()
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.google_logo), // Replace with your Google logo drawable
+                painter = painterResource(id = R.drawable.google_logo),
                 contentDescription = stringResource(id = R.string.google_logo),
-                tint = Color.Unspecified, // Use the original colors of the Google logo
-                modifier = Modifier.size(24.dp)
+                tint = Color.Unspecified,
+                modifier = Modifier.size(dimensionResource(R.dimen.padding24))
             )
-            Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
+            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding8)))
             Text(
-                text = stringResource(id = R.string.signInGoogle), // "Sign in with Google" text
+                text = stringResource(id = R.string.signInGoogle),
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
-                color = MaterialTheme.colorScheme.onSurface // Text color
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }

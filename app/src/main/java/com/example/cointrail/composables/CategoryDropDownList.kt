@@ -11,15 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,8 +41,7 @@ fun CategoryDropDownList(
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<Category?>(null) }
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
+
 
     Box(modifier = Modifier.padding(16.dp)) {
         TextField(
@@ -56,7 +53,7 @@ fun CategoryDropDownList(
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = "Open category dropdown"
+                        contentDescription = stringResource(R.string.categoryDropdown)
                     )
                 }
             },
@@ -68,7 +65,7 @@ fun CategoryDropDownList(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.6f))
-                    .blur(radius = 16.dp) // Android 12+ only
+                    .blur(radius = dimensionResource(R.dimen.padding16))
                     .clickable { expanded = false }
             ) {
                 DropdownMenu(
@@ -76,7 +73,7 @@ fun CategoryDropDownList(
                     onDismissRequest = { expanded = false },
                     modifier = Modifier
                         .width(IntrinsicSize.Max)
-                        .offset(y = 60.dp) // Adjust based on your TextField height
+                        .offset(y = dimensionResource(R.dimen.offset60))
                 ) {
                     items.forEach { item ->
                         DropdownMenuItem(
