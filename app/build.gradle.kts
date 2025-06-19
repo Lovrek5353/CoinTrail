@@ -63,7 +63,7 @@ dependencies {
 
 
     // Import the Firebase BoM
-    implementation(libs.firebase.bom)
+    implementation(platform(libs.firebase.bom))
 
 
     // TODO: Add the dependencies for Firebase products you want to use
@@ -73,6 +73,9 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.koin.core)
     implementation(libs.koin.android)
+
+    implementation(platform(libs.firebase.bom.v33150))
+    implementation(libs.firebase.auth)
 
 
     // Add the dependencies for any other desired Firebase products

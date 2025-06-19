@@ -192,7 +192,7 @@ fun LoginScreen(
             )
             TextButton(
                 onClick = {
-                    //navigate to password reset
+                    //TODO: navigate to reset password
                 },
 
             ) {
@@ -216,7 +216,7 @@ fun LoginScreen(
             )
             TextButton(
                 onClick = {
-                    //navigate to signUP screen
+                    navController.navigate(Screen.SignUpScreen.route)
                 })
             {
                 Text(

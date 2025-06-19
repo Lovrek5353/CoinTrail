@@ -2,6 +2,7 @@ package com.example.cointrail.navigation
 
 import CategoriesViewModel
 import CategoryEditorScreen
+import SignUpScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -129,7 +130,7 @@ fun Navigation(startRoute: String) {
             )
         }
         composable(
-            route=Screen.SavingPocketScreen.route,
+            route = Screen.SavingPocketScreen.route,
             arguments = listOf(navArgument("savingPocketId") { type = NavType.StringType })
         ) {
             val encodedId = it.arguments?.getString("savingPocketId") ?: ""
@@ -146,8 +147,10 @@ fun Navigation(startRoute: String) {
                 viewModel = koinViewModel<SavingPocketsViewModel>()
             )
         }
-        composable(route=Screen.SavingPocketTransactionEditor.route,
-            arguments = listOf(navArgument("savingPocketID") { type = NavType.StringType })) {
+        composable(
+            route = Screen.SavingPocketTransactionEditor.route,
+            arguments = listOf(navArgument("savingPocketID") { type = NavType.StringType })
+        ) {
             val encodedId = it.arguments?.getString("savingPocketID") ?: ""
             val savingPocketID = URLDecoder.decode(encodedId, "UTF-8")
             SavingPocketTransactionEditor(
@@ -156,5 +159,16 @@ fun Navigation(startRoute: String) {
                 savingPocketID = savingPocketID
             )
         }
+        composable(route = Screen.SignUpScreen.route) {
+            SignUpScreen(
+                viewModel = koinViewModel<LoginViewModel>(),
+                onSignUpSuccess = {
+                    navController.navigate(Screen.MainScreen.route) {
+                        popUpTo(Screen.SignUpScreen.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
     }
 }

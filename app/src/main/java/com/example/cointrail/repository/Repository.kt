@@ -36,7 +36,8 @@ interface Repository {
     fun deleteCategory(category: Category)
 
     fun emailLogin(email: String, password: String): Flow<Result<AuthResult>>
-    fun emailSignUp(email: String, password: String): Flow<Result<AuthResult>>
+    //fun emailSignUp(email: String, password: String): Flow<Result<AuthResult>>
+    suspend fun emailSignUp(email: String, password: String): Result<Unit>
     fun signOut()
 
     fun getTabs(): SharedFlow<List<Tab>>
