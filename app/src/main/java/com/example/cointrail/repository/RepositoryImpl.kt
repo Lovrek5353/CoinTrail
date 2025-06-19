@@ -301,10 +301,19 @@ internal class RepositoryImpl
         awaitClose()
     }
 
-
-    override fun emailSignUp(email: String, password: String): Flow<Result<AuthResult>> {
-        TODO("Not yet implemented")
+    override suspend fun emailSignUp(email: String, password: String): Result<Unit> {
+        return try {
+            auth.createUserWithEmailAndPassword(email, password).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
+
+
+//    override fun emailSignUp(email: String, password: String): Flow<Result<AuthResult>> {
+//        TODO("Not yet implemented")
+//    }
 
     override fun signOut() {
         TODO("Not yet implemented")
