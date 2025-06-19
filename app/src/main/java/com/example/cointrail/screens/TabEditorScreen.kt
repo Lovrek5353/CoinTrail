@@ -19,9 +19,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -29,15 +32,37 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
-import com.example.cointrail.composables.CategoryDropDownList
-import com.example.cointrail.data.dummyCategories
+import com.example.cointrail.repository.RepositoryImpl
 import com.example.cointrail.ui.theme.CoinTrailTheme
+import com.example.cointrail.viewModels.TabsViewModel
+import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TabEditorScreen() {
+fun TabEditorScreen(
+    viewModel: TabsViewModel,
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
+    val snackbarHostState=remember{ SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when(event){
+                is TabsViewModel.UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(event.message)
+                }
+                TabsViewModel.UiEvent.SubmissionSuccess ->{
+                    navController.popBackStack()
+                }
+                else -> {}
+            }
+        }
+    }
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -50,7 +75,7 @@ fun TabEditorScreen() {
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = { /* Handle navigation icon click */ }  //navigate to screen before
+                        onClick = { navController.popBackStack() }  //navigate to screen before
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -69,8 +94,8 @@ fun TabEditorScreen() {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.Center, // Centers items vertically
-            horizontalAlignment = Alignment.CenterHorizontally // Centers
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
                 Text(
@@ -128,7 +153,7 @@ fun TabEditorScreen() {
                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item {
-                CategoryDropDownList(dummyCategories) //pass the real category list
+                //CategoryDropDownList(dummyCategories) //pass the real tabs list
             }
             item {
                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
@@ -169,11 +194,17 @@ fun TabEditorScreen() {
 }
 
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview
 @Composable
 
 fun TabEditorScreenPreview() {
+    val navController=rememberNavController()
+    val viewModel = TabsViewModel(repository = RepositoryImpl())
     CoinTrailTheme {
-        TabEditorScreen()
+        TabEditorScreen(
+            viewModel = viewModel,
+            navController = navController
+        )
     }
 }

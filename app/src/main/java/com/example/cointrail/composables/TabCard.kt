@@ -20,7 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cointrail.R
 import com.example.cointrail.data.Tab
-import com.example.cointrail.data.dummyTab
 import com.example.cointrail.ui.theme.CoinTrailTheme
 
 @Composable
@@ -84,9 +83,9 @@ fun TabCard(
 @Composable
 fun TabCardPreview(){
     CoinTrailTheme {
-        TabCard(
-            tab= dummyTab,
-            onClick = {},
-        )
+//        TabCard(
+//            tab= dummyTab,
+//            onClick = {},
+//        )
     }
 }

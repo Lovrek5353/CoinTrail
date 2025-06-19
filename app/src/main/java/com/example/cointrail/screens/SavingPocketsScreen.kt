@@ -20,24 +20,33 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
 import com.example.cointrail.composables.SavingPocketCard
-import com.example.cointrail.data.SavingPocket
-import com.example.cointrail.data.savingPocketsList
+import com.example.cointrail.navigation.Screen
+import com.example.cointrail.repository.RepositoryImpl
 import com.example.cointrail.ui.theme.CoinTrailTheme
+import com.example.cointrail.viewModels.SavingPocketsViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SavingPocketsScreen(
     modifier: Modifier = Modifier,
-    savingPockets: List<SavingPocket>
+    viewModel: SavingPocketsViewModel,
+    navController: NavController
 ){
+
+    val savingPockets by viewModel.fetchSavingPockets().collectAsState(initial= emptyList())
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -50,7 +59,7 @@ fun SavingPocketsScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = { /* Handle navigation icon click */ }
+                        onClick = { navController.popBackStack() }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -66,12 +75,12 @@ fun SavingPocketsScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                // Handle FAB click
+                navController.navigate(Screen.SavingPocketEditorScreen.route)
             }) {
                 Icon(Icons.Filled.Add, contentDescription = "Add")
             }
         },
-        floatingActionButtonPosition = FabPosition.End // Or FabPosition.Center
+        floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
         LazyColumn (
             modifier = modifier
@@ -85,7 +94,7 @@ fun SavingPocketsScreen(
                     savingPocket = savingPocket,
                     modifier = Modifier.padding(horizontal = 16.dp),
                     onClick = {
-                        // Handle card click
+                        navController.navigate(Screen.SavingPocketScreen.createRoute(savingPocket.id))
                     }
                 )
             }
@@ -96,9 +105,12 @@ fun SavingPocketsScreen(
 @Preview
 @Composable
 fun SavingPocketsScreenPreview(){
+    val viewModel= SavingPocketsViewModel(repository = RepositoryImpl())
+    val navController= rememberNavController()
     CoinTrailTheme {
         SavingPocketsScreen(
-            savingPockets = savingPocketsList
+            viewModel = viewModel(),
+            navController = navController
         )
     }
 }

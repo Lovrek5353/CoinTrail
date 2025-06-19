@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class CategoriesViewModel(
-    private val repository: Repository  // Inject repository via constructor
+    private val repository: Repository
 ) : ViewModel() {
 
     // Observe the current user reactively
@@ -82,10 +82,10 @@ class CategoriesViewModel(
     private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
     val transactions: StateFlow<List<Transaction>> = _transactions
 
-    fun observeCategoryTransactions(categoryId: String) {
+    fun observeTransactions(categoryId: String) {
         viewModelScope.launch {
             repository.getCategoryTransactions(categoryId)
-                .collectLatest { txList ->
+                .collect { txList ->
                     _transactions.value = txList
                 }
         }

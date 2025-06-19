@@ -31,7 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cointrail.R
 import com.example.cointrail.data.SavingPocket
-import com.example.cointrail.data.savingPocketsList
 import com.example.cointrail.ui.theme.CoinTrailTheme
 
 @Composable
@@ -94,8 +93,8 @@ fun SavingPocketDropDown(
 @Composable
 fun SavingPocketDropDownPreview(){
     CoinTrailTheme {
-        SavingPocketDropDown(
-            items= savingPocketsList
-        )
+//        SavingPocketDropDown(
+//            items= savingPocketsList
+//        )
     }
 }

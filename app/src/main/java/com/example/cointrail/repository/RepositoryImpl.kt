@@ -15,6 +15,7 @@ import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -37,62 +38,32 @@ internal class RepositoryImpl
 {
     private val _currentUser = MutableStateFlow<User?>(null)
     override val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
+    override fun getAllTransactionsByUser(): SharedFlow<List<Transaction>> {
+        TODO("Not yet implemented")
+    }
+
     private val flowScope = CoroutineScope(Dispatchers.Default)
+    private val repositoryScope= CoroutineScope(Dispatchers.IO+ SupervisorJob())
 
     private val db= Firebase.firestore
     private val auth= FirebaseAuth.getInstance()
 
     private val allCategoriesReference=db.collection("categories")
     private val usersReference=db.collection("users")
+    private val transactionsReference=db.collection("transactions")
+    private val savingPocketsReference=db.collection("savingPockets")
 
 
-
-
-    override fun getAllTransactions(): SharedFlow<List<Transaction>> {
-        val calendar= Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR,-60)
-        val date=Timestamp(calendar.time)
-
-        val flow=callbackFlow<List<Transaction>>{
-            val query=db.collection("transaction")
-                .whereGreaterThanOrEqualTo("date",date)
-
-            val registration=query.addSnapshotListener{value, error ->
-                if(error!=null){
-                    close(error)
-                    return@addSnapshotListener
-                }
-                val transactions = value?.documents?.mapNotNull { doc ->
-                    doc.toObject(Transaction::class.java)
-                } ?: emptyList()
-                trySend(transactions)
-            }
-            awaitClose { registration.remove() }
-        }
-        return flow.shareIn(
-            scope = CoroutineScope(Dispatchers.IO),
-            started = SharingStarted.WhileSubscribed(),
-            replay = 1
-        )
-    }
-
-    override fun getTransactions(): SharedFlow<List<Transaction>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getTransaction(): SharedFlow<Transaction> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getCategoryTransactions(categoryId: String): SharedFlow<List<Transaction>> {
+    // Singleton SharedFlow for all collectors
+    val transactionSharedFlow: SharedFlow<List<Transaction>> by lazy {
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.DAY_OF_YEAR, -60)
         val date = Timestamp(calendar.time)
 
-        val flow = callbackFlow <List<Transaction>> {
-            val query = db.collection("transacitons")
-                .whereEqualTo("categoryId", categoryId)
+        callbackFlow<List<Transaction>> {
+            val query = transactionsReference
                 .whereGreaterThanOrEqualTo("date", date)
+                .whereEqualTo("userID", currentUser.value?.id ?: "")
 
             val registration = query.addSnapshotListener { value, error ->
                 if (error != null) {
@@ -102,21 +73,91 @@ internal class RepositoryImpl
                 val transactions = value?.documents?.mapNotNull { doc ->
                     doc.toObject(Transaction::class.java)
                 } ?: emptyList()
-                trySend(transactions)
+                trySend(transactions).isSuccess
             }
-            awaitClose { registration.remove() }
-        }
 
-        // Share the flow so multiple collectors get the same data
-        return flow.shareIn(
-            scope = CoroutineScope(Dispatchers.IO),
-            started = SharingStarted.WhileSubscribed(),
+            awaitClose { registration.remove() }
+        }.shareIn(
+            scope = repositoryScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
             replay = 1
         )
     }
 
-    override fun addTransaction(transaction: Transaction) {
+
+    fun getAllTransactions(): SharedFlow<List<Transaction>> {
+        return transactionSharedFlow
+    }
+
+
+    override fun getTransactions(): SharedFlow<List<Transaction>> {
         TODO("Not yet implemented")
+    }
+
+    override fun getTransaction(): SharedFlow<Transaction> {
+        TODO("Not yet implemented")
+    }
+
+
+
+    // Cache flows by categoryId to share Firestore listeners
+    private val transactionFlows = mutableMapOf<String, SharedFlow<List<Transaction>>>()
+
+    override fun getCategoryTransactions(categoryId: String): SharedFlow<List<Transaction>> {
+        return transactionFlows.getOrPut(categoryId) {
+            callbackFlow {
+                val calendar = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -60) }
+                val date = Timestamp(calendar.time)
+                val query = db.collection("transactions")
+                    .whereEqualTo("categoryId", categoryId)
+                    .whereGreaterThanOrEqualTo("date", date)
+                val registration = query.addSnapshotListener { value, error ->
+                    if (error != null) {
+                        Log.e("TransactionRepository", "Firebase listener error: $error")
+                        close(error)
+                        return@addSnapshotListener
+                    }
+                    val transactions = value?.documents?.mapNotNull { doc ->
+                        doc.toObject(Transaction::class.java)?.copy(id = doc.id)
+                    } ?: emptyList()
+                    Log.d("TransactionRepository", "Firebase emitted ${transactions.size} transactions.")
+                    val result = trySend(transactions)
+                    if (result.isFailure) {
+                        Log.e("TransactionRepository", "Failed to send transactions to flow: ${result.exceptionOrNull()}")
+                    }
+                }
+                awaitClose {
+                    Log.d("TransactionRepository", "Firebase listener for category $categoryId removed.")
+                    registration.remove()
+                }
+            }.shareIn(
+                scope = CoroutineScope(Dispatchers.IO + SupervisorJob()), // Use the class-level scope
+                started = SharingStarted.WhileSubscribed(5000),
+                replay = 1
+            )
+        }
+    }
+
+
+
+    override fun getTabTransactions(tabId: String): SharedFlow<List<Transaction>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun addTransaction(transaction: Transaction) {
+        try{
+            val data= hashMapOf(
+                "userID" to transaction.userID,
+                "amount" to transaction.amount,
+                "date" to transaction.date,
+                "categoryId" to transaction.categoryId,
+                "description" to transaction.description,
+                "type" to transaction.type
+            )
+            transactionsReference.add(data).await()
+        } catch (e: Exception){
+            throw e
+        }
     }
 
     override fun updateTransaction(transaction: Transaction) {
@@ -124,13 +165,38 @@ internal class RepositoryImpl
     }
 
     override fun deleteTransaction(transaction: Transaction) {
+
         TODO("Not yet implemented")
+    }
+
+    override suspend fun addSavingPocketTransaction(transaction: Transaction) {
+        try{
+            val data= hashMapOf(
+                "userID" to transaction.userID,
+                "amount" to transaction.amount,
+                "date" to transaction.date,
+                "categoryId" to transaction.categoryId,
+                "description" to transaction.description,
+            )
+            transactionsReference.add(data).await()
+        } catch (e: Exception){
+            throw e
+        }
+    }
+
+    override suspend fun updateSavingPocketBalance(savingPocketID: String, newBalance: Double) {
+        try {
+            savingPocketsReference.document(savingPocketID)
+                .update("balance", newBalance)
+        } catch (e: Exception){
+            throw e
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val categoriesFlow = currentUser.flatMapLatest { user ->
         if (user == null) {
-            flowOf(emptyList<Category>())
+            flowOf(emptyList())
         } else {
             createUserCategoriesFlow(user.id!!)
         }
@@ -161,38 +227,40 @@ internal class RepositoryImpl
     }
 
     override fun getCategories(): SharedFlow<List<Category>> = categoriesFlow
+
+
+    private val categoryFlows = mutableMapOf<String, SharedFlow<Category>>()
+
     override fun getCategory(categoryId: String): SharedFlow<Category> {
-        val flow = callbackFlow<Category> {
-            val docRef = db.collection("categories").document(categoryId)
-            val registration = docRef.addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
+        return categoryFlows.getOrPut(categoryId) {
+            callbackFlow {
+                val docRef = db.collection("categories").document(categoryId)
+                val registration = docRef.addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        close(error)
+                        return@addSnapshotListener
+                    }
+                    val category = snapshot?.toObject(Category::class.java)?.copy(id = snapshot.id)
+                    if (category != null) {
+                        trySend(category)
+                    }
                 }
-                val category = snapshot?.toObject(Category::class.java)?.copy(id = snapshot.id)
-                if (category != null) {
-                    trySend(category)
-                }
-            }
-            awaitClose { registration.remove() }
+                awaitClose { registration.remove() }
+            }.shareIn(
+                scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+                started = SharingStarted.WhileSubscribed(5000),
+                replay = 1
+            )
         }
-        return flow.shareIn(
-            scope = CoroutineScope(Dispatchers.IO),
-            started = SharingStarted.WhileSubscribed(),
-            replay = 1
-        )
     }
 
 
-
-
-    // In RepositoryImpl
     override suspend fun addCategory(category: Category) {
         try {
             val data = hashMapOf(
                 "name" to category.name,
                 "description" to category.description,
-                "userId" to category.userId // Add this line
+                "userId" to category.userId
             )
             allCategoriesReference.add(data).await()
         } catch (e: Exception) {
@@ -242,16 +310,56 @@ internal class RepositoryImpl
         TODO("Not yet implemented")
     }
 
-    override fun getTabs(): SharedFlow<List<Tab>> {
-        TODO("Not yet implemented")
+    val tabsSharedFlow: SharedFlow<List<Tab>> by lazy {
+        callbackFlow <List<Tab>> {
+            val query = db.collection("tabs")
+                .whereEqualTo("userID", currentUser.value?.id)
+            val registration = query.addSnapshotListener { value, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val tabs = value?.documents?.mapNotNull { doc ->
+                    doc.toObject(Tab::class.java)
+                } ?: emptyList()
+                trySend(tabs).isSuccess
+            }
+            awaitClose { registration.remove() }
+        }.shareIn(
+            scope = CoroutineScope(Dispatchers.IO),
+            started = SharingStarted.WhileSubscribed(),
+            replay = 1
+        )
     }
+
+    override fun getTabs(): SharedFlow<List<Tab>> {
+        return tabsSharedFlow
+    }
+
 
     override fun getTab(tabId: String): SharedFlow<Tab> {
         TODO("Not yet implemented")
     }
 
     override suspend fun addTab(tab: Tab) {
-        TODO("Not yet implemented")
+        try{
+            val data= hashMapOf(
+                "name" to tab.name,
+                "description" to tab.description,
+                "userID" to tab.userId,
+                "initialAmount" to tab.initialAmount,
+                "outstandingBalance" to tab.outstandingBalance,
+                "startDate" to tab.startDate,
+                "dueDate" to tab.dueDate,
+                "monthlyPayment" to tab.monthlyPayment,
+                "lender" to tab.lender,
+                "status" to tab.status
+            )
+            db.collection("tabs").add(data).await()
+        }
+        catch (e: Exception){
+            throw e
+        }
     }
 
     override fun updateTab(tab: Tab) {
@@ -262,16 +370,72 @@ internal class RepositoryImpl
         TODO("Not yet implemented")
     }
 
+    val savingPocketsSharedFlow: SharedFlow<List<SavingPocket>> by lazy {
+        callbackFlow<List<SavingPocket>> {
+            val query = db.collection("savingPockets")
+                .whereEqualTo("userID", currentUser.value?.id)
+
+            val registration=query.addSnapshotListener { value, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val savingPockets = value?.documents?.mapNotNull { doc ->
+                    doc.toObject(SavingPocket::class.java)
+                } ?: emptyList()
+                trySend(savingPockets).isSuccess
+            }
+            awaitClose { registration.remove() }
+            }.shareIn(
+            scope = repositoryScope,
+            started = SharingStarted.WhileSubscribed(),
+            replay = 1)
+        }
+
     override fun getSavingPockets(): SharedFlow<List<SavingPocket>> {
-        TODO("Not yet implemented")
+        return savingPocketsSharedFlow
     }
 
+    private val savingPocketFlows= mutableMapOf<String, SharedFlow<SavingPocket>>()
+
     override fun getSavingPocket(pocketID: String): SharedFlow<SavingPocket> {
-        TODO("Not yet implemented")
+        return savingPocketFlows.getOrPut(pocketID) {
+            callbackFlow {
+                val docRef = savingPocketsReference.document(pocketID)
+                val registration = docRef.addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        close(error)
+                        return@addSnapshotListener
+                    }
+                    val savingPocket = snapshot?.toObject(SavingPocket::class.java)?.copy(id = snapshot.id)
+                    if (savingPocket != null) {
+                        trySend(savingPocket)
+                    }
+                }
+                awaitClose { registration.remove() }
+            }.shareIn(
+                scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+                started = SharingStarted.WhileSubscribed(5000),
+                replay = 1)
+        }
     }
 
     override suspend fun addSavingPocket(savingPocket: SavingPocket) {
-        TODO("Not yet implemented")
+        Log.d("RepositoryImpl", "Adding saving pocket: $savingPocket")
+        try{
+            val data= hashMapOf(
+                "name" to savingPocket.name,
+                "description" to savingPocket.description,
+                "userID" to savingPocket.userID,
+                "targetAmount" to savingPocket.targetAmount,
+                "targetDate" to savingPocket.targetDate,
+                "balance" to 0.0
+            )
+            savingPocketsReference.add(data).await()
+        }
+        catch (e: Exception){
+            throw e
+        }
     }
 
     override fun updateSavingPocket(savingPocket: SavingPocket) {

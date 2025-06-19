@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -27,8 +28,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
+import com.example.cointrail.composables.TabCard
 import com.example.cointrail.navigation.Screen
+import com.example.cointrail.repository.RepositoryImpl
 import com.example.cointrail.ui.theme.CoinTrailTheme
 import com.example.cointrail.viewModels.TabsViewModel
 
@@ -40,7 +44,7 @@ fun TabsScreen(
     viewModel: TabsViewModel,
     navController: NavController
 ){
-    val tabList by viewModel.fetchCategories().collectAsState(initial = emptyList())
+    val tabList by viewModel.fetchTabs().collectAsState(initial = emptyList())
 
     Scaffold(
         topBar = {
@@ -58,7 +62,7 @@ fun TabsScreen(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.emailIcon),
+                            contentDescription = stringResource(id = R.string.backIcon),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -70,7 +74,7 @@ fun TabsScreen(
         },
         floatingActionButton = { //navigate to TabScreen editor
             FloatingActionButton(onClick = {
-                navController.navigate(Screen.CategoryEditorScreen.route)
+                navController.navigate(Screen.TabEditorScreen.route)
             }) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.addCTab))
             }
@@ -79,15 +83,20 @@ fun TabsScreen(
     )
     {
         LazyColumn (
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(dimensionResource(R.dimen.padding16))
                 .padding(horizontal = dimensionResource(id = R.dimen.padding16)),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ){
-            //doraditi
-           // items(tabList)
+            items(tabList){ tab ->
+                TabCard(tab = tab,
+                    onClick = {
+                        navController.navigate(Screen.TabScreen.createRoute(tab.id))
+                    }
+                )
+            }
         }
     }
 }
@@ -95,7 +104,12 @@ fun TabsScreen(
 @Preview
 @Composable
 fun TabsScreenPreview(){
+    val viewModel = TabsViewModel(repository = RepositoryImpl())
+    val navController= rememberNavController()
     CoinTrailTheme {
-       // TabsScreen()
+        TabsScreen(
+            navController=navController,
+            viewModel = viewModel
+        )
     }
 }

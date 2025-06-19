@@ -1,6 +1,7 @@
 package com.example.cointrail.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -29,15 +30,34 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
 import com.example.cointrail.R
-import com.example.cointrail.composables.CategoryDropDownList
-import com.example.cointrail.data.dummyCategories
 import com.example.cointrail.ui.theme.CoinTrailTheme
+import com.example.cointrail.viewModels.SavingPocketsViewModel
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.navigation.compose.rememberNavController
+import com.example.cointrail.composables.DatePickerModal
+import com.example.cointrail.navigation.Screen
+import com.example.cointrail.repository.RepositoryImpl
+import java.util.Date
+import java.util.Locale
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SavingPocketEditorScreen(){
+fun SavingPocketEditorScreen(
+    modifier: Modifier=Modifier,
+    navController: NavController,
+    viewModel: SavingPocketsViewModel
+){
+    var showDatePicker by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -50,7 +70,7 @@ fun SavingPocketEditorScreen(){
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = { /* Handle navigation icon click */ }  //navigate to screen before
+                        onClick = { navController.popBackStack() }  //navigate to screen before
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -74,6 +94,31 @@ fun SavingPocketEditorScreen(){
         ) {
             item {
                 Text(
+                    text = stringResource(id = R.string.savingPocketName),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding8))
+                )
+            }
+            item {
+                OutlinedTextField(
+                    value = viewModel.nameString,
+                    onValueChange = viewModel::onNameInput,
+                    label = { Text(text = stringResource(id = R.string.savingPocketName)) },
+                    placeholder = { Text(text = stringResource(id = R.string.savingPocketName)) },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        capitalization = KeyboardCapitalization.None,
+                        keyboardType = KeyboardType.Text
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
+            }
+            item {
+                Text(
                     text = stringResource(id = R.string.savingAmount),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onBackground
@@ -84,16 +129,14 @@ fun SavingPocketEditorScreen(){
             }
             item {
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = { /* Handle value change */ },
+                    value = viewModel.targetAmountString,
+                    onValueChange = viewModel::onTargetAmountInput,
                     label = { Text(text = stringResource(id = R.string.savingAmount)) },
                     placeholder = { Text(text = stringResource(id = R.string.savingAmount)) },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         capitalization = KeyboardCapitalization.None,
                         keyboardType = KeyboardType.Number
-                    ),
-                    modifier = Modifier
-                        .height(dimensionResource(id = R.dimen.padding16))
+                    )
                 )
             }
             item {
@@ -101,7 +144,7 @@ fun SavingPocketEditorScreen(){
             }
             item {
                 Text(
-                    text = stringResource(id = R.string.transactionDate),
+                    text = stringResource(id = R.string.savingPocketDate),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -110,55 +153,76 @@ fun SavingPocketEditorScreen(){
                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item {
-                //Doraditi
-                //DatePickerModal()
+                val selectedDateMillis = viewModel.selectedDateMillis
+                val formattedDate = selectedDateMillis?.let {
+                    java.text.SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+                        .format(Date(it))
+                } ?: stringResource(id = R.string.selectDatePrompt)
 
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = dimensionResource(id = R.dimen.padding16))
+                        .clickable { showDatePicker = true }
+                        .height(dimensionResource(id = R.dimen.padding48)),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = formattedDate,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+            }
+
+            item {
+                if (showDatePicker) {
+                    DatePickerModal(
+                        onDateSelected = { millis ->
+                            if (millis != null) {
+                                viewModel.onDateSelected(millis)
+                            }
+                            showDatePicker = false
+                        },
+                        onDismiss = { showDatePicker = false }
+                    )
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item {
                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item {
                 Text(
-                    text = stringResource(id = R.string.transactionCategory),
+                    text = stringResource(id = R.string.savingPocketDescription),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
             }
             item {
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
-            }
-            item {
-                CategoryDropDownList(dummyCategories) //pass the real category list
-            }
-            item {
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
-            }
-            item {
-                Text(
-                    text = stringResource(id = R.string.transactionDescription),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
+                Spacer(modifier = modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item {
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = { /* Handle value change */ },
-                    label = { Text(text = stringResource(id = R.string.transactionDescription)) },
+                    value = viewModel.descriptionString,
+                    onValueChange = viewModel::onDescriptionInput,
+                    label = { Text(text = stringResource(id = R.string.savingPocketDescription)) },
                 )
             }
             item {
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
+                Spacer(modifier = modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item {
                 Button(
-                    onClick = { /* Handle save click */ },
-                    modifier = Modifier
-                        .fillMaxWidth(2f / 3f) // 2/3 of the parent width
-                        .aspectRatio(5f) // width:height ratio, so height = width/3
+                    onClick = {
+                        viewModel.onSubmit()
+                        navController.navigate(Screen.SavingPocketsScreen.route)
+                              },
+                    modifier = modifier
+                        .fillMaxWidth(2f / 3f)
+                        .aspectRatio(5f)
                 ) {
                     Text(text = stringResource(id = R.string.add))
                 }
@@ -171,7 +235,13 @@ fun SavingPocketEditorScreen(){
 @Preview
 @Composable
 fun SavingPocketEditorScreenPreview(){
+
+    val viewModel=SavingPocketsViewModel(repository = RepositoryImpl())
+    val navController= rememberNavController()
     CoinTrailTheme {
-        SavingPocketEditorScreen()
+        SavingPocketEditorScreen(
+            viewModel = viewModel,
+            navController = navController
+        )
     }
 }

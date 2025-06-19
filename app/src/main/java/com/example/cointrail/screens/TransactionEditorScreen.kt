@@ -1,6 +1,7 @@
 package com.example.cointrail.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -26,6 +27,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -33,16 +39,32 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
 import com.example.cointrail.composables.CategoryDropDownList
 import com.example.cointrail.composables.DatePickerModal
+import com.example.cointrail.data.Category
 import com.example.cointrail.data.dummyCategories
+import com.example.cointrail.data.enums.TransactionType
+import com.example.cointrail.repository.RepositoryImpl
 import com.example.cointrail.ui.theme.CoinTrailTheme
+import com.example.cointrail.viewModels.MainViewModel
+import com.example.cointrail.viewModels.TabsViewModel
+import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TransactionEditorScreen(){
+fun TransactionEditorScreen(
+    viewModel: MainViewModel,
+    navController: NavController,
+    modifier: Modifier = Modifier
+){
+    var showDatePicker by remember { mutableStateOf(false) }
+    var selectedCategory by remember { mutableStateOf<Category?>(null) }
+    val categoryList by viewModel.fetchCategories().collectAsState(initial= emptyList())
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -55,7 +77,7 @@ fun TransactionEditorScreen(){
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = { /* Handle navigation icon click */ }  //navigate to screen before
+                        onClick = { navController.popBackStack() }  //navigate to screen before
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -88,17 +110,17 @@ fun TransactionEditorScreen(){
             }
             item{
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = { /* Handle value change */ },
+                    value = viewModel.amountInputString,
+                    onValueChange = viewModel::onAmountInputChange,
                     label = { Text(text = stringResource(id = R.string.transactionAmount)) },
                     placeholder = { Text(text = stringResource(id = R.string.transactionAmount)) },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         capitalization = KeyboardCapitalization.None,
                         keyboardType = KeyboardType.Number
                     ),
-                    modifier = Modifier
-                        .height(dimensionResource(id = R.dimen.padding16))
+                    modifier = Modifier.fillMaxWidth() // No explicit height needed
                 )
+
             }
             item{
                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
@@ -112,11 +134,43 @@ fun TransactionEditorScreen(){
             item{
                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
-            item{
-                //Doraditi
-                //DatePickerModal()
+            item {
+                val selectedDateMillis = viewModel.transaction.date?.toDate()?.time
+                val formattedDate = selectedDateMillis?.let {
+                    java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault())
+                        .format(java.util.Date(it))
+                } ?: stringResource(id = R.string.selectDatePrompt)
 
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = dimensionResource(id = R.dimen.padding16))
+                        .clickable { showDatePicker = true }
+                        .height(dimensionResource(id = R.dimen.padding48)),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = formattedDate,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             }
+
+            item {
+                if (showDatePicker) {
+                    DatePickerModal(
+                        onDateSelected = { millis ->
+                            if (millis != null) {
+                                viewModel.onDateSelected(millis)
+                            }
+                            showDatePicker = false
+                        },
+                        onDismiss = { showDatePicker = false }
+                    )
+                }
+            }
+
             item {
                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
@@ -131,7 +185,14 @@ fun TransactionEditorScreen(){
                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item{
-                CategoryDropDownList(dummyCategories) //pass the real category list
+                CategoryDropDownList(
+                    items = categoryList,
+                    selectedItem = selectedCategory,
+                    onCategorySelected = { category ->
+                        selectedCategory = category
+                        viewModel.onCategorySelected(category)
+                    }
+                )
             }
             item {
                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
@@ -148,8 +209,8 @@ fun TransactionEditorScreen(){
             }
             item{
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = { /* Handle value change */ },
+                    value = viewModel.descriptionInputString,
+                    onValueChange = viewModel::onDescriptionChange,
                     label = { Text(text = stringResource(id = R.string.transactionDescription)) },
                 )
             }
@@ -172,6 +233,8 @@ fun TransactionEditorScreen(){
                         .padding(dimensionResource(id = R.dimen.padding16)),
                     contentAlignment = Alignment.Center
                 ) {
+                    val selectedType = viewModel.transaction.type
+
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -180,8 +243,8 @@ fun TransactionEditorScreen(){
                             modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding16))
                         )
                         RadioButton(
-                            selected = true,
-                            onClick = { /* Handle selection */ }
+                            selected = selectedType == TransactionType.DEPOSIT,
+                            onClick = { viewModel.transactionTypeSelected(TransactionType.DEPOSIT) }
                         )
                         Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding16)))
                         Text(
@@ -189,8 +252,8 @@ fun TransactionEditorScreen(){
                             modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding16))
                         )
                         RadioButton(
-                            selected = false,
-                            onClick = { /* Handle selection */ }
+                            selected = selectedType == TransactionType.WITHDRAWAL,
+                            onClick = { viewModel.transactionTypeSelected(TransactionType.WITHDRAWAL) }
                         )
                     }
                 }
@@ -202,7 +265,7 @@ fun TransactionEditorScreen(){
                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding16)))
             }
             item {
-                Button(onClick = { /* Handle save click */ })
+                Button(onClick = { viewModel.onSubmit() })
                 {
                     Text(text = stringResource(id = R.string.add))
                 }
@@ -215,7 +278,9 @@ fun TransactionEditorScreen(){
 @Preview
 @Composable
 fun TransactionEditorScreenPreview(){
+    val viewModel=MainViewModel(repository = RepositoryImpl())
+    val navController= rememberNavController()
     CoinTrailTheme {
-        TransactionEditorScreen()
+        TransactionEditorScreen(viewModel = viewModel, navController = navController)
     }
 }

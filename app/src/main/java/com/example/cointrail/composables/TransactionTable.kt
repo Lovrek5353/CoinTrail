@@ -17,10 +17,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.cointrail.R
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import com.example.cointrail.data.Transaction
-import com.example.cointrail.data.dummyTransactions
+import com.google.firebase.Timestamp
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.LocalDate
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -28,13 +29,8 @@ fun TransactionsTable(transactions: List<Transaction>) {
     val configuration = LocalConfiguration.current
     val tableHeight = (configuration.screenHeightDp.dp) / 2
 
-    fun formatDate(dateString: String): String {
-        return try {
-            val date = LocalDate.parse(dateString)
-            date.format(DateTimeFormatter.ofPattern("MMM dd"))
-        } catch (e: Exception) {
-            dateString // fallback if parsing fails
-        }
+    fun formatDate(timestamp: Timestamp?): String {
+        return timestamp?.toLocalDate()?.format(DateTimeFormatter.ofPattern("MMM dd")) ?: "N/A"
     }
 
     Box(
@@ -63,23 +59,23 @@ fun TransactionsTable(transactions: List<Transaction>) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text= stringResource(R.string.Date),
+                            text = stringResource(R.string.Date),
                             modifier = Modifier.weight(1f),
                             style = MaterialTheme.typography.labelLarge
                         )
                         Text(
-                            text= stringResource(R.string.name),
+                            text = stringResource(R.string.name),
                             modifier = Modifier.weight(1.2f),
                             style = MaterialTheme.typography.labelLarge
                         )
                         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding12)))
                         Text(
-                            text= stringResource(R.string.category),
+                            text = stringResource(R.string.category),
                             modifier = Modifier.weight(1.5f),
                             style = MaterialTheme.typography.labelLarge
                         )
                         Text(
-                            text= stringResource(R.string.amount),
+                            text = stringResource(R.string.amount),
                             modifier = Modifier.weight(1f),
                             style = MaterialTheme.typography.labelLarge
                         )
@@ -124,10 +120,17 @@ fun TransactionsTable(transactions: List<Transaction>) {
     }
 }
 
+private fun Timestamp.toLocalDate(): LocalDate {
+    return this.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+}
+
 @Preview(showBackground = true)
 @Composable
 fun TransactionsTablePreview() {
-    TransactionsTable(
-        dummyTransactions
-    )
+//    TransactionsTable(
+//        // Update dummy data to use Timestamps
+//        dummyTransactions.map {
+//            it.copy(date = Timestamp.now()) // Replace with actual timestamps for your preview
+//        }
+//    )
 }
