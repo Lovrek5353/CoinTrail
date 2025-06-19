@@ -6,6 +6,7 @@ import com.example.cointrail.data.Tab
 import com.example.cointrail.data.Transaction
 import com.example.cointrail.data.User
 import com.google.firebase.auth.AuthResult
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,15 +15,19 @@ interface Repository {
 
     val currentUser: StateFlow<User?>
 
-    fun getAllTransactions(): SharedFlow<List<Transaction>>
+    fun getAllTransactionsByUser(): SharedFlow<List<Transaction>>
     fun getTransactions(): SharedFlow<List<Transaction>>
     fun getTransaction(): SharedFlow<Transaction>
 
     fun getCategoryTransactions(categoryId: String): SharedFlow<List<Transaction>>
+    fun getTabTransactions(tabId: String): SharedFlow<List<Transaction>>
 
-    fun addTransaction(transaction: Transaction)
+    suspend fun addTransaction(transaction: Transaction)
     fun updateTransaction(transaction: Transaction)
     fun deleteTransaction(transaction: Transaction)
+
+    suspend fun addSavingPocketTransaction(transaction: Transaction)
+    suspend fun updateSavingPocketBalance(savingPocketID: String, newBalance: Double)
 
     fun getCategories(): SharedFlow<List<Category>>
     fun getCategory(categoryId: String): SharedFlow<Category>

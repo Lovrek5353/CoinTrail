@@ -13,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
@@ -26,16 +25,15 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.example.cointrail.data.Transaction
-import com.example.cointrail.data.dummyTransactions
 import com.example.cointrail.ui.theme.CoinTrailTheme
-import java.time.LocalDate
+import com.google.firebase.Timestamp
+import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.math.roundToInt
 
-// Renamed from SpendingHistogramGranularity
 enum class SpendingLineGraphGranularity(val label: String) {
     DAY("Day"),
     WEEK("Week"),
@@ -43,15 +41,13 @@ enum class SpendingLineGraphGranularity(val label: String) {
     YEAR("Year")
 }
 
-// Renamed from GroupKey
 sealed class LineGraphGroupKey {
-    data class Day(val date: String) : LineGraphGroupKey()
+    data class Day(val date: LocalDate) : LineGraphGroupKey()
     data class Week(val year: Int, val week: Int) : LineGraphGroupKey()
     data class Month(val year: Int, val month: Int) : LineGraphGroupKey()
     data class Year(val year: Int) : LineGraphGroupKey()
 }
 
-// Renamed from SpendingHistogramGraph
 @Composable
 fun SpendingLineGraph(
     transactions: List<Transaction>,
@@ -75,50 +71,58 @@ fun SpendingLineGraph(
     val (groupedData, sortedKeys, keyToLabel) = remember(transactions, granularity) {
         when (granularity) {
             SpendingLineGraphGranularity.DAY -> {
-                val formatter = DateTimeFormatter.ISO_DATE
-                val data = transactions.groupBy { LineGraphGroupKey.Day(it.date) }
+                val data = transactions
+                    .filter { it.date != null }
+                    .groupBy { LineGraphGroupKey.Day(it.date!!.toLocalDate()) }
                     .mapValues { (_, txs) -> txs.sumOf { it.amount } }
                 val keys = data.keys.sortedBy { it.date }
                 val labelMap = keys.associateWith { key ->
-                    val dateStr = key.date
-                    LocalDate.parse(dateStr, formatter).format(DateTimeFormatter.ofPattern("MMM dd"))
+                    key.date.format(DateTimeFormatter.ofPattern("MMM dd"))
                 }
                 Triple(data, keys, labelMap)
             }
             SpendingLineGraphGranularity.WEEK -> {
                 val weekFields = WeekFields.ISO
-                val data = transactions.groupBy {
-                    val (y, w) = it.date.toYearWeek()
-                    LineGraphGroupKey.Week(y, w)
-                }
+                val data = transactions
+                    .filter { it.date != null }
+                    .groupBy {
+                        val localDate = it.date!!.toLocalDate()
+                        val week = localDate.get(weekFields.weekOfWeekBasedYear())
+                        LineGraphGroupKey.Week(localDate.year, week)
+                    }
                     .mapValues { (_, txs) -> txs.sumOf { it.amount } }
                 val keys = data.keys.sortedWith(compareBy({ it.year }, { it.week }))
                 val labelMap = keys.associateWith { key ->
-                    val (year, week) = key
                     val date = LocalDate.now()
-                        .withYear(year)
-                        .with(weekFields.weekOfWeekBasedYear(), week.toLong())
+                        .withYear(key.year)
+                        .with(weekFields.weekOfWeekBasedYear(), key.week.toLong())
                         .with(weekFields.dayOfWeek(), 1)
                     date.format(DateTimeFormatter.ofPattern("MMM dd"))
                 }
                 Triple(data, keys, labelMap)
             }
             SpendingLineGraphGranularity.MONTH -> {
-                val data = transactions.groupBy {
-                    val (y, m) = it.date.toYearMonth()
-                    LineGraphGroupKey.Month(y, m)
-                }
+                val data = transactions
+                    .filter { it.date != null }
+                    .groupBy {
+                        val localDate = it.date!!.toLocalDate()
+                        LineGraphGroupKey.Month(localDate.year, localDate.monthValue)
+                    }
                     .mapValues { (_, txs) -> txs.sumOf { it.amount } }
                 val keys = data.keys.sortedWith(compareBy({ it.year }, { it.month }))
                 val labelMap = keys.associateWith { key ->
-                    val (year, month) = key
-                    val date = LocalDate.of(year, month, 1)
-                    date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()) + " $year"
+                    val date = LocalDate.of(key.year, key.month, 1)
+                    date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()) + " ${key.year}"
                 }
                 Triple(data, keys, labelMap)
             }
             SpendingLineGraphGranularity.YEAR -> {
-                val data = transactions.groupBy { LineGraphGroupKey.Year(it.date.toYear()) }
+                val data = transactions
+                    .filter { it.date != null }
+                    .groupBy {
+                        val localDate = it.date!!.toLocalDate()
+                        LineGraphGroupKey.Year(localDate.year)
+                    }
                     .mapValues { (_, txs) -> txs.sumOf { it.amount } }
                 val keys = data.keys.sortedBy { it.year }
                 val labelMap = keys.associateWith { key -> key.year.toString() }
@@ -131,7 +135,6 @@ fun SpendingLineGraph(
     var selectedPoint by remember { mutableStateOf<Pair<Int, Offset>?>(null) }
 
     Column(modifier = modifier) {
-        // Renamed from GranularitySelector
         LineGraphGranularitySelector(
             selected = granularity,
             onSelect = { granularity = it }
@@ -162,7 +165,6 @@ fun SpendingLineGraph(
                         .fillMaxHeight()
                         .horizontalScroll(scrollState)
                 ) {
-                    // Renamed from ChartCanvas
                     LineGraphCanvas(
                         sortedKeys = sortedKeys,
                         groupedData = groupedData,
@@ -184,7 +186,6 @@ fun SpendingLineGraph(
                         val key = sortedKeys.getOrNull(index)
                         if (key != null) {
                             val amount = groupedData[key] ?: 0.0
-                            // Renamed from BarPopup
                             LineGraphPopup(
                                 label = keyToLabel[key] ?: key.toString(),
                                 amount = amount,
@@ -248,7 +249,6 @@ private fun YAxisLabels(
     }
 }
 
-// Renamed from ChartCanvas
 @Composable
 private fun LineGraphCanvas(
     sortedKeys: List<LineGraphGroupKey>,
@@ -318,7 +318,6 @@ private fun LineGraphCanvas(
     }
 }
 
-// Renamed from BarPopup
 @Composable
 private fun LineGraphPopup(
     label: String,
@@ -357,41 +356,18 @@ private fun LineGraphPopup(
     }
 }
 
-// --- Helper functions ---
+// --- Timestamp helpers ---
 
-private fun String.toYearWeek(): Pair<Int, Int> {
-    return try {
-        val date = LocalDate.parse(this, DateTimeFormatter.ISO_DATE)
-        val week = date.get(WeekFields.ISO.weekOfWeekBasedYear())
-        Pair(date.year, week)
-    } catch (e: Exception) {
-        0 to 0
-    }
+private fun Timestamp.toLocalDate(): LocalDate {
+    return this.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
 }
 
-private fun String.toYearMonth(): Pair<Int, Int> {
-    return try {
-        val date = LocalDate.parse(this, DateTimeFormatter.ISO_DATE)
-        Pair(date.year, date.monthValue)
-    } catch (e: Exception) {
-        0 to 0
-    }
-}
+// --- Preview ---
 
-private fun String.toYear(): Int {
-    return try {
-        val date = LocalDate.parse(this, DateTimeFormatter.ISO_DATE)
-        date.year
-    } catch (e: Exception) {
-        0
-    }
-}
-
-// Renamed from PreviewSpendingHistogramGraph
 @Preview
 @Composable
 fun PreviewSpendingLineGraph() {
     CoinTrailTheme {
-        SpendingLineGraph(transactions = dummyTransactions)
+        //SpendingLineGraph(transactions = dummyTransactions)
     }
 }

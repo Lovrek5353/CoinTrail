@@ -60,4 +60,13 @@
     <string name="addCategory">Add new category</string>
     <string name="addTransaction">Add new transaction</string>
     <string name="addCTab">Add new tab</string>
+    <string name="Add">Add</string>
+    <string name="selectDatePrompt">Select a date</string>
+    <string name="transaction">Transaction</string>
+    <string name="delete_transaction">Delete transaction</string>
+    <string name="edit_transaction">Transaction edit</string>
+    <string name="savingPocketDate">Saving pocket target date</string>
+    <string name="savingPocketDescription">Saving pocket description</string>
+    <string name="savingPocketName">Saving pocket name</string>
+    <string name="savingPocketTransactionAmout">Deposit amount</string>
 </resources>

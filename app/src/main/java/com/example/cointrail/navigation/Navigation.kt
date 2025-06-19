@@ -12,9 +12,21 @@ import com.example.cointrail.screens.CategoriesScreen
 import com.example.cointrail.screens.CategoryScreen
 import com.example.cointrail.screens.LoginScreen
 import com.example.cointrail.screens.MainScreen
+import com.example.cointrail.screens.SavingPocketEditorScreen
+import com.example.cointrail.screens.SavingPocketScreen
+import com.example.cointrail.screens.SavingPocketTransactionEditor
+import com.example.cointrail.screens.SavingPocketsScreen
+import com.example.cointrail.screens.TabEditorScreen
+import com.example.cointrail.screens.TabScreen
+import com.example.cointrail.screens.TabsScreen
+import com.example.cointrail.screens.TransactionEditorScreen
+import com.example.cointrail.screens.TransactionScreen
 import com.example.cointrail.viewModels.LoginViewModel
 import com.example.cointrail.viewModels.MainViewModel
-import org.koin.androidx.compose.get
+import com.example.cointrail.viewModels.SavingPocketsViewModel
+import com.example.cointrail.viewModels.TabsViewModel
+import com.example.cointrail.viewModels.TransactionViewModel
+import org.koin.androidx.compose.koinViewModel
 import java.net.URLDecoder
 
 @Composable
@@ -28,25 +40,68 @@ fun Navigation(startRoute: String) {
         composable(route = Screen.MainScreen.route) {
             MainScreen(
                 navController = navController,
-                viewModel = get<MainViewModel>()
+                viewModel = koinViewModel<MainViewModel>()
             )
         }
-        composable(route=Screen.LoginScreen.route) {
+        composable(route = Screen.LoginScreen.route) {
             LoginScreen(
                 navController = navController,
-                viewModel = get<LoginViewModel>()
+                viewModel = koinViewModel<LoginViewModel>()
             )
         }
-        composable(route=Screen.CategoriesScreen.route) {
+        composable(route = Screen.CategoriesScreen.route) {
             CategoriesScreen(
                 navController = navController,
-                viewModel = get<CategoriesViewModel>()
+                viewModel = koinViewModel<CategoriesViewModel>()
             )
         }
-        composable(route=Screen.CategoryEditorScreen.route) {
+        composable(route = Screen.CategoryEditorScreen.route) {
             CategoryEditorScreen(
                 navController = navController,
-                viewModel = get<CategoriesViewModel>()
+                viewModel = koinViewModel<CategoriesViewModel>()
+            )
+        }
+        composable(route = Screen.TransactionEditorScreen.route) {
+            TransactionEditorScreen(
+                navController = navController,
+                viewModel = koinViewModel<MainViewModel>()
+            )
+        }
+        composable(
+            route = Screen.TransactionScreen.route,
+            arguments = listOf(
+                navArgument("categoryID") { type = NavType.StringType },
+                navArgument("transactionID") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val encodedCategoryId = backStackEntry.arguments?.getString("categoryID") ?: ""
+            val categoryId = URLDecoder.decode(encodedCategoryId, "UTF-8")
+            val encodedTransactionId = backStackEntry.arguments?.getString("transactionID") ?: ""
+            val transactionId = URLDecoder.decode(encodedTransactionId, "UTF-8")
+
+            TransactionScreen(
+                navController = navController,
+                categoryID = categoryId,
+                transactionID = transactionId,
+                viewModel = koinViewModel<TransactionViewModel>()
+            )
+        }
+        composable(route = Screen.TabsScreen.route) {
+            TabsScreen(
+                navController = navController,
+                viewModel = koinViewModel<TabsViewModel>()
+            )
+        }
+        composable(route = Screen.TabEditorScreen.route) {
+            TabEditorScreen(
+                navController = navController,
+                viewModel = koinViewModel<TabsViewModel>()
+            )
+        }
+        composable(route = Screen.SavingPocketsScreen.route) {
+            SavingPocketsScreen(
+                navController = navController,
+                viewModel = koinViewModel<SavingPocketsViewModel>()
             )
         }
         composable(
@@ -55,7 +110,51 @@ fun Navigation(startRoute: String) {
         ) { backStackEntry ->
             val encodedId = backStackEntry.arguments?.getString("categoryId") ?: ""
             val categoryId = URLDecoder.decode(encodedId, "UTF-8")
-            CategoryScreen(categoryId = categoryId, viewModel = get<CategoriesViewModel>(), navController = navController)
+            CategoryScreen(
+                categoryId = categoryId,
+                viewModel = koinViewModel<CategoriesViewModel>(),
+                navController = navController
+            )
+        }
+        composable(
+            route = Screen.TabScreen.route,
+            arguments = listOf(navArgument("tabId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val encodedId = backStackEntry.arguments?.getString("tabId") ?: ""
+            val tabId = URLDecoder.decode(encodedId, "UTF-8")
+            TabScreen(
+                tabID = tabId,
+                viewModel = koinViewModel<TabsViewModel>(),
+                navController = navController
+            )
+        }
+        composable(
+            route=Screen.SavingPocketScreen.route,
+            arguments = listOf(navArgument("savingPocketId") { type = NavType.StringType })
+        ) {
+            val encodedId = it.arguments?.getString("savingPocketId") ?: ""
+            val savingPocketId = URLDecoder.decode(encodedId, "UTF-8")
+            SavingPocketScreen(
+                savingPocketId = savingPocketId,
+                viewModel = koinViewModel<SavingPocketsViewModel>(),
+                navController = navController
+            )
+        }
+        composable(route = Screen.SavingPocketEditorScreen.route) {
+            SavingPocketEditorScreen(
+                navController = navController,
+                viewModel = koinViewModel<SavingPocketsViewModel>()
+            )
+        }
+        composable(route=Screen.SavingPocketTransactionEditor.route,
+            arguments = listOf(navArgument("savingPocketID") { type = NavType.StringType })) {
+            val encodedId = it.arguments?.getString("savingPocketID") ?: ""
+            val savingPocketID = URLDecoder.decode(encodedId, "UTF-8")
+            SavingPocketTransactionEditor(
+                viewModel = koinViewModel<SavingPocketsViewModel>(),
+                navController = navController,
+                savingPocketID = savingPocketID
+            )
         }
     }
 }

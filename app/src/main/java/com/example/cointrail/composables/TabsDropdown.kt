@@ -27,9 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.cointrail.R
-import com.example.cointrail.data.savingPocketsList
 import com.example.cointrail.ui.theme.CoinTrailTheme
 
 @Composable
@@ -93,8 +91,8 @@ fun TabsDropDown(
 @Composable
 fun TabDropDownPreview(){
     CoinTrailTheme {
-        SavingPocketDropDown(
-            items= savingPocketsList
-        )
+//        SavingPocketDropDown(
+//            items= savingPocketsList
+//        )
     }
 }

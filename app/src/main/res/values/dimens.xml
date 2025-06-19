@@ -20,4 +20,7 @@
     <dimen name="padding6">6dp</dimen>
     <dimen name="padding96">96dp</dimen>
     <dimen name="padding50">50dp</dimen>
+    <dimen name="padding48">48dp</dimen>
+    <dimen name="round20">20dp</dimen>
+    <dimen name="size36">36dp</dimen>
 </resources>

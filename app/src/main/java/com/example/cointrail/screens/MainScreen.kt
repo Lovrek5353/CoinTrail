@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
@@ -31,14 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
 import com.example.cointrail.navigation.Screen
 import com.example.cointrail.repository.RepositoryImpl
 import com.example.cointrail.ui.theme.CoinTrailTheme
-import com.example.cointrail.viewModels.LoginViewModel
 import com.example.cointrail.viewModels.MainViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -98,13 +95,13 @@ fun MainScreen(
                             contentDescription = "temp1"
                         )
                     }
-                    IconButton(onClick = { /* Navigate to Savings */ }) { //navigate to savings
+                    IconButton(onClick = { navController.navigate(Screen.SavingPocketsScreen.route) }) { //navigate to savings
                         Icon(
                             imageVector = Icons.Filled.Add,
                             contentDescription = "temp1"
                         )
                     }
-                    IconButton(onClick = { /* Navigate to Loans */ }) { // navigate to tabs
+                    IconButton(onClick = { navController.navigate(Screen.TabsScreen.route)}) { // navigate to tabs
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = "temp1"
@@ -127,7 +124,7 @@ fun MainScreen(
         },
         floatingActionButton = { //navigate to main transaction editor
             FloatingActionButton(onClick = {
-                navController.navigate(Screen.CategoryEditorScreen.route)
+                navController.navigate(Screen.TransactionEditorScreen.route)
             }) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.addTransaction))
             }

@@ -26,16 +26,14 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.example.cointrail.data.Transaction
-import com.example.cointrail.data.dummyTransactions
 import com.example.cointrail.ui.theme.CoinTrailTheme
+import com.google.firebase.Timestamp
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.math.roundToInt
-
-//extract to enum folder
 
 enum class SpendingHistogramGranularity(val label: String) {
     DAY("Day"),
@@ -45,7 +43,7 @@ enum class SpendingHistogramGranularity(val label: String) {
 }
 
 sealed class GroupKey {
-    data class Day(val date: String) : GroupKey()
+    data class Day(val date: LocalDate) : GroupKey()
     data class Week(val year: Int, val week: Int) : GroupKey()
     data class Month(val year: Int, val month: Int) : GroupKey()
     data class Year(val year: Int) : GroupKey()
@@ -75,50 +73,58 @@ fun SpendingHistogramGraph(
     val (groupedData, sortedKeys, keyToLabel) = remember(transactions, granularity) {
         when (granularity) {
             SpendingHistogramGranularity.DAY -> {
-                val formatter = DateTimeFormatter.ISO_DATE
-                val data = transactions.groupBy { GroupKey.Day(it.date) }
+                val data = transactions
+                    .filter { it.date != null }
+                    .groupBy { GroupKey.Day(it.date!!.toLocalDate()) }
                     .mapValues { (_, txs) -> txs.sumOf { it.amount } }
                 val keys = data.keys.sortedBy { it.date }
                 val labelMap = keys.associateWith { key ->
-                    val dateStr = key.date
-                    LocalDate.parse(dateStr, formatter).format(DateTimeFormatter.ofPattern("MMM dd"))
+                    key.date.format(DateTimeFormatter.ofPattern("MMM dd"))
                 }
                 Triple(data, keys, labelMap)
             }
             SpendingHistogramGranularity.WEEK -> {
                 val weekFields = WeekFields.ISO
-                val data = transactions.groupBy {
-                    val (y, w) = it.date.toYearWeek()
-                    GroupKey.Week(y, w)
-                }
+                val data = transactions
+                    .filter { it.date != null }
+                    .groupBy {
+                        val localDate = it.date!!.toLocalDate()
+                        val week = localDate.get(weekFields.weekOfWeekBasedYear())
+                        GroupKey.Week(localDate.year, week)
+                    }
                     .mapValues { (_, txs) -> txs.sumOf { it.amount } }
                 val keys = data.keys.sortedWith(compareBy({ it.year }, { it.week }))
                 val labelMap = keys.associateWith { key ->
-                    val (year, week) = key
                     val date = LocalDate.now()
-                        .withYear(year)
-                        .with(weekFields.weekOfWeekBasedYear(), week.toLong())
+                        .withYear(key.year)
+                        .with(weekFields.weekOfWeekBasedYear(), key.week.toLong())
                         .with(weekFields.dayOfWeek(), 1)
                     date.format(DateTimeFormatter.ofPattern("MMM dd"))
                 }
                 Triple(data, keys, labelMap)
             }
             SpendingHistogramGranularity.MONTH -> {
-                val data = transactions.groupBy {
-                    val (y, m) = it.date.toYearMonth()
-                    GroupKey.Month(y, m)
-                }
+                val data = transactions
+                    .filter { it.date != null }
+                    .groupBy {
+                        val localDate = it.date!!.toLocalDate()
+                        GroupKey.Month(localDate.year, localDate.monthValue)
+                    }
                     .mapValues { (_, txs) -> txs.sumOf { it.amount } }
                 val keys = data.keys.sortedWith(compareBy({ it.year }, { it.month }))
                 val labelMap = keys.associateWith { key ->
-                    val (year, month) = key
-                    val date = LocalDate.of(year, month, 1)
-                    date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()) + " $year"
+                    val date = LocalDate.of(key.year, key.month, 1)
+                    date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()) + " ${key.year}"
                 }
                 Triple(data, keys, labelMap)
             }
             SpendingHistogramGranularity.YEAR -> {
-                val data = transactions.groupBy { GroupKey.Year(it.date.toYear()) }
+                val data = transactions
+                    .filter { it.date != null }
+                    .groupBy {
+                        val localDate = it.date!!.toLocalDate()
+                        GroupKey.Year(localDate.year)
+                    }
                     .mapValues { (_, txs) -> txs.sumOf { it.amount } }
                 val keys = data.keys.sortedBy { it.year }
                 val labelMap = keys.associateWith { key -> key.year.toString() }
@@ -343,40 +349,17 @@ private fun BarPopup(
     }
 }
 
-// --- Helper functions ---
+// --- Timestamp helpers ---
 
-private fun String.toYearWeek(): Pair<Int, Int> {
-    return try {
-        val date = LocalDate.parse(this, DateTimeFormatter.ISO_DATE)
-        val week = date.get(WeekFields.ISO.weekOfWeekBasedYear())
-        Pair(date.year, week)
-    } catch (e: Exception) {
-        0 to 0
-    }
-}
+private fun Timestamp.toLocalDate(): LocalDate =
+    this.toDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate()
 
-private fun String.toYearMonth(): Pair<Int, Int> {
-    return try {
-        val date = LocalDate.parse(this, DateTimeFormatter.ISO_DATE)
-        Pair(date.year, date.monthValue)
-    } catch (e: Exception) {
-        0 to 0
-    }
-}
-
-private fun String.toYear(): Int {
-    return try {
-        val date = LocalDate.parse(this, DateTimeFormatter.ISO_DATE)
-        date.year
-    } catch (e: Exception) {
-        0
-    }
-}
+// --- Preview ---
 
 @Preview
 @Composable
 fun PreviewSpendingHistogramGraph() {
     CoinTrailTheme {
-        SpendingHistogramGraph(transactions = dummyTransactions)
+       // SpendingHistogramGraph(transactions = dummyTransactions)
     }
 }

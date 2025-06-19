@@ -38,10 +38,10 @@ import com.example.cointrail.ui.theme.CoinTrailTheme
 @Composable
 fun CategoryDropDownList(
     items: List<Category>,
+    selectedItem: Category?,
+    onCategorySelected: (Category) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf<Category?>(null) }
-
 
     Box(modifier = Modifier.padding(16.dp)) {
         TextField(
@@ -79,7 +79,7 @@ fun CategoryDropDownList(
                         DropdownMenuItem(
                             text = { Text(item.name) },
                             onClick = {
-                                selectedItem = item
+                                onCategorySelected(item)
                                 expanded = false
                             }
                         )
@@ -92,11 +92,14 @@ fun CategoryDropDownList(
 
 
 
-
 @Preview
 @Composable
 fun CategoryDropDownListPreview(){
     CoinTrailTheme {
-        CategoryDropDownList(dummyCategories)
+        CategoryDropDownList(
+            dummyCategories,
+            onCategorySelected = {},
+            selectedItem = TODO()
+        )
     }
 }

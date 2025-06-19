@@ -14,7 +14,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cointrail.R
 import com.example.cointrail.data.SavingPocket
-import com.example.cointrail.data.dummySavingPocket
 
 @Composable
 fun SavingPocketCard(
@@ -79,10 +78,10 @@ fun SavingPocketCardPreview() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        SavingPocketCard(
-            savingPocket = dummySavingPocket,
-            modifier = Modifier.fillMaxWidth(0.75f),
-            onClick = {}
-        )
+//        SavingPocketCard(
+//            savingPocket = dummySavingPocket,
+//            modifier = Modifier.fillMaxWidth(0.75f),
+//            onClick = {}
+//        )
     }
 }
