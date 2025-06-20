@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.cointrail.screens.CategoriesScreen
 import com.example.cointrail.screens.CategoryScreen
+import com.example.cointrail.screens.ForgotPasswordScreen
 import com.example.cointrail.screens.LoginScreen
 import com.example.cointrail.screens.MainScreen
 import com.example.cointrail.screens.SavingPocketEditorScreen
@@ -167,6 +168,15 @@ fun Navigation(startRoute: String) {
                         popUpTo(Screen.SignUpScreen.route) { inclusive = true }
                     }
                 }
+            )
+        }
+        composable(route = Screen.ForgotPasswordScreen.route) {
+            ForgotPasswordScreen(
+                viewModel = koinViewModel<LoginViewModel>(),
+                onForgotPasswordClick = {
+                    navController.navigate(Screen.LoginScreen.route) {
+                        popUpTo(Screen.ForgotPasswordScreen.route) { inclusive = true }
+                    }}
             )
         }
 

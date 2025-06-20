@@ -69,4 +69,6 @@
     <string name="savingPocketDescription">Saving pocket description</string>
     <string name="savingPocketName">Saving pocket name</string>
     <string name="savingPocketTransactionAmout">Deposit amount</string>
+    <string name="forgotYourPassword">Forgot your password</string>
+    <string name="sendLink">Send reset link</string>
 </resources>

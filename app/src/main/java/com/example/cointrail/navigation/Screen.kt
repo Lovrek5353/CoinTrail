@@ -38,4 +38,5 @@ sealed class Screen (val route: String) {
             "saving_pocket_transaction_editor_screen/${URLEncoder.encode(savingPocketID, "UTF-8")}"
     }
     data object SignUpScreen: Screen("sign_up_screen")
+    data object ForgotPasswordScreen: Screen("forgot_password_screen")
 }

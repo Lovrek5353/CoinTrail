@@ -40,6 +40,8 @@ interface Repository {
     suspend fun emailSignUp(email: String, password: String): Result<Unit>
     fun signOut()
 
+    suspend fun sendPasswordResetEmail(email: String): Result<Unit>
+
     fun getTabs(): SharedFlow<List<Tab>>
     fun getTab(tabId: String): SharedFlow<Tab>
     suspend fun addTab(tab: Tab)

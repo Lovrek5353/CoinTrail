@@ -310,6 +310,18 @@ internal class RepositoryImpl
         }
     }
 
+    override suspend fun sendPasswordResetEmail(email: String): Result<Unit> {
+        Log.d("RepositoryImpl", "Sending password reset email to: $email")
+        return try {
+            Log.d("RepositoryImpl", "Password reset email sent successfully")
+            auth.sendPasswordResetEmail(email).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("RepositoryImpl", "Error sending password reset email", e)
+            Result.failure(e)
+        }
+    }
+
 
 //    override fun emailSignUp(email: String, password: String): Flow<Result<AuthResult>> {
 //        TODO("Not yet implemented")
