@@ -1,9 +1,11 @@
 package com.example.cointrail.screens
 
+import TabSummary
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -89,23 +91,31 @@ fun TabScreen(
             }
         }
     )
-    {
-        LazyColumn {
+    {innerPadding ->
+        LazyColumn(
+            modifier=modifier.padding(innerPadding)
+        ) {
             item {
-                Text(
-                    text = tab?.name.toString(),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onPrimary)
-        }
-            item {
-                Spacer(modifier = modifier.height(dimensionResource(R.dimen.padding112)))
+                tab?.let {
+                    Log.d("TabScreen", "Rendering TabSummary with: ${it.name}") // Add this log
+                    TabSummary(tab = it)
+                } ?: run {
+                    Log.d("TabScreen", "Tab is null, showing loading indicator.") // Add this log
+                    // Show a loading indicator or placeholder
+                    Text(
+                        text = "Loading Tab Details...",
+                        modifier = Modifier.padding(dimensionResource(R.dimen.padding8))
+                    )
+                    // Optional: CircularProgressIndicator()
+                }
             }
+
             item{
                 SpendingHistogramGraph(transactionList.value)
             }
-            item{
-                Spacer(modifier = modifier.height(dimensionResource(R.dimen.padding50)))
-            }
+//            item{
+//                Spacer(modifier = modifier.height(dimensionResource(R.dimen.padding50)))
+//            }
             item {
                 SmallTransactionsTable(
                     transactionList.value,

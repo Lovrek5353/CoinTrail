@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -14,6 +15,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.util.Date
+import com.google.firebase.Timestamp
 
 class CategoriesViewModel(
     private val repository: Repository
@@ -100,6 +103,95 @@ class CategoriesViewModel(
                 .collectLatest { category ->
                     _category.value = category
                 }
+        }
+    }
+
+    var transactionAmountString by mutableStateOf("")
+        private set
+    var transactionDescriptionString by mutableStateOf("")
+        private set
+    var transactionDateMillis by mutableStateOf<Long?>(null)
+        private set
+    var transactionCategoryID by mutableStateOf("")
+        private set
+
+    fun onAmountInputChange(newAmount: String){
+        transactionAmountString = newAmount
+    }
+
+    fun onTransactionDateSelected(millis: Long?) {
+        transactionDateMillis = millis
+    }
+    fun onTransactionDescriptionChange(newDescription: String) {
+        transactionDescriptionString = newDescription
+    }
+    fun setTransactionCategory(categoryID: String) {
+        transactionCategoryID = categoryID
+    }
+
+    fun onTransactionSubmit(){
+        Log.d("CategoriesViewModel", "onTransactionSubmit called")
+        viewModelScope.launch {
+            try{
+                val currentUser = user.value
+                val userId = currentUser?.id ?: run {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("User not logged in"))
+                    Log.d("CategoriesViewModel", "User not logged in")
+                    return@launch
+                }
+
+                //Validation
+                if (transactionAmountString.isBlank()) {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Amount cannot be empty"))
+                    Log.d("CategoriesViewModel", "Amount cannot be empty")
+                    return@launch
+                }
+                val amountValue = transactionAmountString.toDoubleOrNull()
+                if (amountValue == null || amountValue <= 0) {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Invalid amount"))
+                    Log.d("CategoriesViewModel", "Invalid amount")
+                    return@launch
+                }
+                if (transactionDescriptionString.isBlank()) {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Description cannot be empty"))
+                    Log.d("CategoriesViewModel", "Description cannot be empty")
+                    return@launch
+                }
+                if (transactionDateMillis == null) {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Date cannot be empty"))
+                    Log.d("CategoriesViewModel", "Date cannot be empty")
+                    return@launch
+                }
+                if (transactionCategoryID.isBlank()) {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Category cannot be empty"))
+                    Log.d("CategoriesViewModel", "Category cannot be empty")
+                    return@launch
+                }
+
+                //Create transaction object
+
+                val validatedTransaction = Transaction(
+                    amount = amountValue,
+                    description = transactionDescriptionString,
+                    date = Timestamp(Date(transactionDateMillis!!)),
+                    categoryId = transactionCategoryID,
+                    userID = userId
+                )
+
+                //Add transaction
+                repository.addTransaction(validatedTransaction)
+                Log.d("CategoriesViewModel", "Transaction added successfully")
+
+                //Reset transaction form fields
+                transactionAmountString = ""
+                transactionDescriptionString = ""
+                transactionDateMillis = null
+                transactionCategoryID = ""
+            }
+            catch (e: Exception) {
+                val errorMessage = "Error saving transaction: ${e.message ?: "Unknown error"}"
+                _eventFlow.emit(UiEvent.ShowSnackbar(errorMessage))
+            }
         }
     }
 

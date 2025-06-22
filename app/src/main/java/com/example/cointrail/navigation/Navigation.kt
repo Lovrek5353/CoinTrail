@@ -3,6 +3,7 @@ package com.example.cointrail.navigation
 import CategoriesViewModel
 import CategoryEditorScreen
 import SignUpScreen
+import TransactionScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -11,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.cointrail.screens.CategoriesScreen
 import com.example.cointrail.screens.CategoryScreen
+import com.example.cointrail.screens.CategoryTransactionEditorScreen
 import com.example.cointrail.screens.ForgotPasswordScreen
 import com.example.cointrail.screens.LoginScreen
 import com.example.cointrail.screens.MainScreen
@@ -22,7 +24,6 @@ import com.example.cointrail.screens.TabEditorScreen
 import com.example.cointrail.screens.TabScreen
 import com.example.cointrail.screens.TabsScreen
 import com.example.cointrail.screens.TransactionEditorScreen
-import com.example.cointrail.screens.TransactionScreen
 import com.example.cointrail.viewModels.LoginViewModel
 import com.example.cointrail.viewModels.MainViewModel
 import com.example.cointrail.viewModels.SavingPocketsViewModel
@@ -191,6 +192,16 @@ fun Navigation(startRoute: String) {
                     }}
             )
         }
-
+        composable(route=Screen.CategoryTransactionEditorScreen.route,
+            arguments = listOf(navArgument("categoryID") { type = NavType.StringType })
+        ){
+            val encodedId = it.arguments?.getString("categoryID") ?: ""
+            val categoryID = URLDecoder.decode(encodedId, "UTF-8")
+            CategoryTransactionEditorScreen(
+                viewModel = koinViewModel<CategoriesViewModel>(),
+                navController = navController,
+                categoryId = categoryID
+            )
+        }
     }
 }

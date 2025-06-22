@@ -23,7 +23,9 @@ interface Repository {
 
     suspend fun addTransaction(transaction: Transaction)
     fun updateTransaction(transaction: Transaction)
-    fun deleteTransaction(transaction: Transaction)
+    suspend fun deleteTransaction(transactionID: String): Result<Unit>
+
+    suspend fun updateBalanceAfterDeletion(documentId: String, newBalance: Double)
 
     suspend fun addSavingPocketTransaction(transaction: Transaction)
     suspend fun updateSavingPocketBalance(savingPocketID: String, newBalance: Double)

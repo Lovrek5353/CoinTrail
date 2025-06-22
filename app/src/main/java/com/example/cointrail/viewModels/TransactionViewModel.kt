@@ -5,9 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cointrail.data.Transaction
 import com.example.cointrail.repository.Repository
+import com.example.cointrail.viewModels.TabsViewModel.UiEvent
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -22,6 +25,10 @@ class TransactionViewModel(
 
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
+
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
 
     private var currentJob: Job? = null
     private var lastLoadParams: Pair<String, String>? = null
@@ -60,5 +67,30 @@ class TransactionViewModel(
                 _transaction.value = null
             }
         }
+    }
+    fun deleteTransaction(transactionId: String) {
+        viewModelScope.launch {
+            val result = repository.deleteTransaction(transactionId)
+            if (result.isSuccess) {
+                _eventFlow.emit(UiEvent.ShowSnackbar("Deleted successfully"))
+            } else {
+                _eventFlow.emit(UiEvent.ShowSnackbar("Delete failed"))
+            }
+        }
+    }
+    fun updateBalanceAfterDeletion(documentId: String, transactionAmount: Double) {
+        viewModelScope.launch {
+            try {
+                repository.updateBalanceAfterDeletion(documentId, transactionAmount)
+                // Optionally emit a success event or update state
+            } catch (e: Exception) {
+                // Optionally emit an error event or update state
+            }
+        }
+    }
+
+    sealed class UiEvent {
+        data class ShowSnackbar(val message: String) : UiEvent()
+        data object SubmissionSuccess : UiEvent()
     }
 }

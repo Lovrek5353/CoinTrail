@@ -18,7 +18,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,7 +26,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -165,10 +163,74 @@ internal class RepositoryImpl
         TODO("Not yet implemented")
     }
 
-    override fun deleteTransaction(transaction: Transaction) {
-
-        TODO("Not yet implemented")
+    override suspend fun deleteTransaction(transactionID: String): Result<Unit> {
+        return try {
+            transactionsReference.document(transactionID).delete().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
+
+
+    override suspend fun updateBalanceAfterDeletion(documentId: String, transactionAmount: Double) {
+        val tabReference = db.collection("tabs").document(documentId)
+        val pocketReference = db.collection("savingPockets").document(documentId)
+
+        Log.d(
+            "UpdateBalance",
+            "Starting updateBalanceAfterDeletion for documentId: $documentId, transactionAmount: $transactionAmount"
+        )
+
+        // Try tabs first
+        val tabSnapshot = tabReference.get().await()
+        Log.d(
+            "UpdateBalance",
+            "Checked tabs collection for $documentId. Exists: ${tabSnapshot.exists()}"
+        )
+        if (tabSnapshot.exists()) {
+            val currentBalance = tabSnapshot.getDouble("outstandingBalance") ?: 0.0
+            val newBalance = currentBalance - transactionAmount
+            Log.d(
+                "UpdateBalance",
+                "Tab found. Current outstandingBalance: $currentBalance, New outstandingBalance: $newBalance"
+            )
+            tabReference.update("outstandingBalance", newBalance).await()
+            Log.d(
+                "UpdateBalance",
+                "Updated outstandingBalance in tabs for $documentId to $newBalance"
+            )
+            return
+        }
+
+        // If not found in tabs, try savingPockets
+        val pocketSnapshot = pocketReference.get().await()
+        Log.d(
+            "UpdateBalance",
+            "Checked savingPockets collection for $documentId. Exists: ${pocketSnapshot.exists()}"
+        )
+        if (pocketSnapshot.exists()) {
+            val currentBalance = pocketSnapshot.getDouble("balance") ?: 0.0
+            val newBalance = currentBalance - transactionAmount
+            Log.d(
+                "UpdateBalance",
+                "SavingPocket found. Current balance: $currentBalance, New balance: $newBalance"
+            )
+            pocketReference.update("balance", newBalance).await()
+            Log.d(
+                "UpdateBalance",
+                "Updated balance in savingPockets for $documentId to $newBalance"
+            )
+            return
+        }
+
+        // If neither exists
+        Log.w(
+            "UpdateBalance",
+            "Document $documentId not found in either tabs or savingPockets. No update performed."
+        )
+    }
+
 
     override suspend fun addSavingPocketTransaction(transaction: Transaction) {
         try{
@@ -409,7 +471,7 @@ internal class RepositoryImpl
             val data= hashMapOf(
                 "name" to tab.name,
                 "description" to tab.description,
-                "userID" to tab.userId,
+                "userID" to tab.userID,
                 "initialAmount" to tab.initialAmount,
                 "outstandingBalance" to tab.outstandingBalance,
                 "startDate" to tab.startDate,

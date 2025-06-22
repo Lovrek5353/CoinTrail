@@ -1,8 +1,11 @@
 package com.example.cointrail.screens
 
+import ProgressIndicator
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -31,8 +34,8 @@ import com.example.cointrail.composables.SmallTransactionsTable
 import com.example.cointrail.composables.SpendingHistogramGraph
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.example.cointrail.composables.SavingPocketSummary
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SavingPocketScreen(
@@ -85,23 +88,32 @@ fun SavingPocketScreen(
             }
         },
     )
-    {
-        LazyColumn {
-            item {
-                Text(
-                    text = savingPocket?.name.toString(),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
+    { innerPadding ->
+        LazyColumn(
+            modifier = modifier.padding(innerPadding)
+        ) {
+            item{
+                savingPocket?.let {
+                    Log.d("SavingPocketScreen", "Rendering ProgressIndicator with: ${it.name}") // Add this log
+                    ProgressIndicator(it.balance, it.targetAmount)
+                }
             }
             item {
-                Spacer(modifier = modifier.height(dimensionResource(R.dimen.padding112)))
+                savingPocket?.let {
+                    Log.d("SavingPocketScreen", "Rendering SavingPocketSummary with: ${it.name}") // Add this log
+                    SavingPocketSummary(savingPocket=it)
+                } ?: run {
+                    Log.d("SavingPocketScreen", "SavingPocket is null, showing loading indicator.") // Add this log
+                    // Show a loading indicator or placeholder
+                    Text(
+                        text = "Loading Saving Pocket Details...",
+                        modifier = Modifier.padding(dimensionResource(R.dimen.padding8))
+                    )
+                    // Optional: CircularProgressIndicator()
+                }
             }
             item {
                 SpendingHistogramGraph(transactionList)
-            }
-            item {
-                Spacer(modifier = modifier.height(dimensionResource(R.dimen.padding50)))
             }
             item {
                 SmallTransactionsTable(
