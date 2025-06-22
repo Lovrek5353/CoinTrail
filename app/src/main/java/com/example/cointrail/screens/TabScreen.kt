@@ -1,6 +1,7 @@
 package com.example.cointrail.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,6 +20,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -26,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
+import com.example.cointrail.composables.SmallTransactionsTable
 import com.example.cointrail.composables.SpendingHistogramGraph
 import com.example.cointrail.navigation.Screen
 import com.example.cointrail.repository.RepositoryImpl
@@ -42,10 +45,12 @@ fun TabScreen(
     navController: NavController
 ){
     LaunchedEffect(tabID){
-        viewModel.fetchTabTransactions(tabID)
-        viewModel.getTab(tabID)
+        viewModel.observeTransactions(tabID)
+        viewModel.fetchTab(tabID)
     }
-    val tab = viewModel.singleTab.collectAsState()
+
+    Log.d("TabScreen", "Open a screen with TabID: $tabID")
+    val tab by viewModel.singleTab.collectAsState()
     val transactionList = viewModel.transactions.collectAsState()
 
     Scaffold (
@@ -53,7 +58,7 @@ fun TabScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = (tab.value?.name.toString()),
+                        text = (tab?.name.toString()),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -77,7 +82,7 @@ fun TabScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController.navigate(Screen.TabEditorScreen.route)
+                    navController.navigate(Screen.TabTransactionEditorScreen.createRoute(tabID))
                 }
             ) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.Add))
@@ -88,7 +93,7 @@ fun TabScreen(
         LazyColumn {
             item {
                 Text(
-                    text = tab.value?.name.toString(),
+                    text = tab?.name.toString(),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onPrimary)
         }
@@ -100,6 +105,19 @@ fun TabScreen(
             }
             item{
                 Spacer(modifier = modifier.height(dimensionResource(R.dimen.padding50)))
+            }
+            item {
+                SmallTransactionsTable(
+                    transactionList.value,
+                    onTransactionClick = { categoryId, transactionId ->
+                        navController.navigate(
+                            Screen.TransactionScreen.createRoute(
+                                categoryId,
+                                transactionId
+                            )
+                        )
+                    }
+                )
             }
         }
     }

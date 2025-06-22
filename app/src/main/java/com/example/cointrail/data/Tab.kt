@@ -11,8 +11,8 @@ data class Tab(
     var initialAmount: Double = 0.0,            // Original loan amount
     var outstandingBalance: Double = 0.0,   // Remaining amount to be repaid
     var interestRate: Double = 0.0,         // Annual interest rate (as a percentage, e.g., 5.5)
-    var startDate: Timestamp?,             // When the loan started (ISO date string)
-    var dueDate: Timestamp?,               // When the loan should be fully repaid
+    var startDate: Timestamp? =null,             // When the loan started (ISO date string)
+    var dueDate: Timestamp? =null,               // When the loan should be fully repaid
     var monthlyPayment: Double = 0.0,       // Regular payment amount
     var lender: String = "",                // Who provided the loan
     var status: String = "active"           // e.g., "active", "paid", "overdue"

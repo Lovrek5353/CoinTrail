@@ -52,6 +52,7 @@ internal class RepositoryImpl
     private val usersReference=db.collection("users")
     private val transactionsReference=db.collection("transactions")
     private val savingPocketsReference=db.collection("savingPockets")
+    private val tabsReference=db.collection("tabs")
 
 
     // Singleton SharedFlow for all collectors
@@ -193,6 +194,32 @@ internal class RepositoryImpl
         }
     }
 
+    override suspend fun addTabTransaction(transaction: Transaction) {
+        try{
+            val data= hashMapOf(
+                "userID" to transaction.userID,
+                "amount" to transaction.amount,
+                "date" to transaction.date,
+                "categoryId" to transaction.categoryId,
+                "description" to transaction.description,
+                "type" to transaction.type
+            )
+            transactionsReference.add(data).await()
+        }
+        catch (e: Exception){
+            throw e
+        }
+    }
+
+    override suspend fun updateTabBalance(tabID: String, newBalance: Double) {
+        try {
+            tabsReference.document(tabID)
+                .update("outstandingBalance", newBalance)
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val categoriesFlow = currentUser.flatMapLatest { user ->
         if (user == null) {
@@ -323,12 +350,9 @@ internal class RepositoryImpl
     }
 
 
-//    override fun emailSignUp(email: String, password: String): Flow<Result<AuthResult>> {
-//        TODO("Not yet implemented")
-//    }
 
     override fun signOut() {
-        TODO("Not yet implemented")
+        auth.signOut()
     }
 
     val tabsSharedFlow: SharedFlow<List<Tab>> by lazy {
@@ -357,9 +381,27 @@ internal class RepositoryImpl
         return tabsSharedFlow
     }
 
-
+    private val tabsFlows = mutableMapOf<String, SharedFlow<Tab>>()
     override fun getTab(tabId: String): SharedFlow<Tab> {
-        TODO("Not yet implemented")
+        return tabsFlows.getOrPut(tabId) {
+            callbackFlow {
+                val registration=tabsReference.document(tabId).addSnapshotListener{ snapshot, error ->
+                    if (error != null) {
+                        close(error)
+                        return@addSnapshotListener
+                    }
+                    val tab=snapshot?.toObject<Tab>()?.copy(id=snapshot.id)
+                    if (tab != null) {
+                        trySend(tab)
+                    }
+                }
+                awaitClose { registration.remove() }
+            }.shareIn(
+                scope = repositoryScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                replay = 1
+            )
+        }
     }
 
     override suspend fun addTab(tab: Tab) {

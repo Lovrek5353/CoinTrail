@@ -1,6 +1,7 @@
 package com.example.cointrail.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -51,7 +52,7 @@ fun TabsScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.categories),
+                        text = stringResource(id = R.string.tabs),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -81,11 +82,11 @@ fun TabsScreen(
         },
         floatingActionButtonPosition = FabPosition.End
     )
-    {
+    { innerPadding ->
         LazyColumn (
             modifier = modifier
                 .fillMaxSize()
-                .padding(dimensionResource(R.dimen.padding16))
+                .padding(innerPadding)
                 .padding(horizontal = dimensionResource(id = R.dimen.padding16)),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
@@ -93,6 +94,7 @@ fun TabsScreen(
             items(tabList){ tab ->
                 TabCard(tab = tab,
                     onClick = {
+                        Log.d("TabsScreen", "Navigating to tab: ${tab.id}")
                         navController.navigate(Screen.TabScreen.createRoute(tab.id))
                     }
                 )

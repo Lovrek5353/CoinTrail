@@ -39,4 +39,8 @@ sealed class Screen (val route: String) {
     }
     data object SignUpScreen: Screen("sign_up_screen")
     data object ForgotPasswordScreen: Screen("forgot_password_screen")
+    data object TabTransactionEditorScreen: Screen("tab_transaction_editor_screen/{tabID}") {
+        fun createRoute(tabID: String) =
+            "tab_transaction_editor_screen/${URLEncoder.encode(tabID, "UTF-8")}"
+    }
 }

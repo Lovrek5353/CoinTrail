@@ -160,6 +160,18 @@ fun Navigation(startRoute: String) {
                 savingPocketID = savingPocketID
             )
         }
+        composable(
+            route=Screen.TabTransactionEditorScreen.route,
+            arguments = listOf(navArgument("tabID") { type = NavType.StringType })
+        ){
+            val encodedId = it.arguments?.getString("tabID") ?: ""
+            val tabID = URLDecoder.decode(encodedId, "UTF-8")
+            com.example.cointrail.screens.TabTransactionEditor(
+                viewModel = koinViewModel<TabsViewModel>(),
+                navController = navController,
+                tabID = tabID
+            )
+        }
         composable(route = Screen.SignUpScreen.route) {
             SignUpScreen(
                 viewModel = koinViewModel<LoginViewModel>(),

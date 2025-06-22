@@ -96,6 +96,11 @@ class LoginViewModel    (var repository: Repository): ViewModel()
         }
     }
 
+    fun signOut() {  //call this on button click and navigate to login screen in the same Unit
+        repository.signOut()
+        // Optionally emit an event for UI navigation or feedback
+    }
+
     sealed class UiEvent {
         data class ShowSnackbar(val message: String) : UiEvent()
         data object SignUpSuccess : UiEvent()

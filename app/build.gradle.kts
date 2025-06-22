@@ -77,6 +77,8 @@ dependencies {
     implementation(platform(libs.firebase.bom.v33150))
     implementation(libs.firebase.auth)
 
+    //implementation (libs.androidx.material.icons.extended)
+
 
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries

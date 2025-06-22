@@ -27,21 +27,26 @@ fun TabCard(
     tab: Tab,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
-){
-    val progress = if (tab.outstandingBalance > 0)
-        (tab.outstandingBalance / tab.initialAmount).coerceIn(0.0, 1.0).toFloat()
+) {
+    val progress = if (tab.initialAmount > 0)
+        (tab.outstandingBalance.toFloat() / tab.initialAmount.toFloat()).coerceIn(0f, 1f)
     else 0f
+
+    // Explicitly convert dimension resource to Dp for RoundedCornerShape
+    val cornerRadius = dimensionResource(R.dimen.round24)
+    val clipRadius = dimensionResource(R.dimen.clip4)
+    val borderWidth = dimensionResource(R.dimen.padding1)
 
     Surface(
         modifier = modifier
             .padding(dimensionResource(R.dimen.padding8))
             .border(
-                width = dimensionResource(R.dimen.padding1),
+                width = borderWidth,
                 color = MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(R.dimen.round24)
+                shape = RoundedCornerShape(cornerRadius)
             )
             .clickable { onClick() },
-        shape = RoundedCornerShape(dimensionResource(R.dimen.round24)),
+        shape = RoundedCornerShape(cornerRadius),
         color = MaterialTheme.colorScheme.surfaceVariant
     ) {
         Column(
@@ -58,11 +63,11 @@ fun TabCard(
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.height12)))
 
             LinearProgressIndicator(
-                progress = { progress },
+                progress = progress, // Use the calculated float progress
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(dimensionResource(R.dimen.padding8))
-                    .clip(RoundedCornerShape(R.dimen.clip4)),
+                    .clip(RoundedCornerShape(clipRadius)),
                 color = MaterialTheme.colorScheme.primary,
                 trackColor = MaterialTheme.colorScheme.secondaryContainer,
             )
@@ -78,13 +83,22 @@ fun TabCard(
     }
 }
 
-
 @Preview
 @Composable
-fun TabCardPreview(){
+fun TabCardPreview() {
     CoinTrailTheme {
+        // You'll need to define a dummyTab here for the preview to work
+//        val dummyTab = Tab(
+//            id = "1",
+//            name = "Groceries",
+//            initialAmount = 100.0,
+//            outstandingBalance = 50.0,
+//            currency = "USD",
+//            createdTimestamp = System.currentTimeMillis(),
+//            lastModifiedTimestamp = System.currentTimeMillis()
+//        )
 //        TabCard(
-//            tab= dummyTab,
+//            tab = dummyTab,
 //            onClick = {},
 //        )
     }

@@ -190,7 +190,8 @@ class SavingPocketsViewModel(
                 // }
 
 
-                val currentSavingPocket = _savingPocket.value // Get the currently observed saving pocket
+                val currentSavingPocket =
+                    _savingPocket.value // Get the currently observed saving pocket
                 Log.d("CurrentSavingPocket", currentSavingPocket.toString())
                 val savingPocketId = currentSavingPocket?.id
                 if (savingPocketId.isNullOrEmpty()) {
@@ -200,7 +201,8 @@ class SavingPocketsViewModel(
                 }
 
                 // Calculate new balance
-                val oldBalance = currentSavingPocket.balance // Use the balance from the observed pocket
+                val oldBalance =
+                    currentSavingPocket.balance // Use the balance from the observed pocket
                 val newBalance = oldBalance + amountValue
 
                 // Create transaction object directly from the individual states
@@ -259,9 +261,9 @@ class SavingPocketsViewModel(
                 }
         }
     }
-}
 
-sealed class UiEvent {
-    data class ShowSnackbar(val message: String) : UiEvent()
-    data object SubmissionSuccess : UiEvent()
+    sealed class UiEvent {
+        data class ShowSnackbar(val message: String) : UiEvent()
+        data object SubmissionSuccess : UiEvent()
+    }
 }
