@@ -38,4 +38,20 @@ sealed class Screen (val route: String) {
             "saving_pocket_transaction_editor_screen/${URLEncoder.encode(savingPocketID, "UTF-8")}"
     }
     data object SignUpScreen: Screen("sign_up_screen")
+    data object ForgotPasswordScreen: Screen("forgot_password_screen")
+    data object TabTransactionEditorScreen: Screen("tab_transaction_editor_screen/{tabID}") {
+        fun createRoute(tabID: String) =
+            "tab_transaction_editor_screen/${URLEncoder.encode(tabID, "UTF-8")}"
+    }
+    data object CategoryTransactionEditorScreen: Screen("category_transaction_editor_screen/{categoryID}") {
+        fun createRoute(categoryID: String) =
+            "category_transaction_editor_screen/${URLEncoder.encode(categoryID, "UTF-8")}"
+    }
+
+    data object StocksScreen: Screen("stocks_screen")
+
+    data object UpdateTransactionEditorScreen: Screen("update_transaction_editor_screen/{transactionID}") {
+        fun createRoute(transactionID: String) =
+            "update_transaction_editor_screen/${URLEncoder.encode(transactionID, "UTF-8")}"
+    }
 }

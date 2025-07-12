@@ -3,6 +3,7 @@ package com.example.cointrail.navigation
 import CategoriesViewModel
 import CategoryEditorScreen
 import SignUpScreen
+import TransactionScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -11,6 +12,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.cointrail.screens.CategoriesScreen
 import com.example.cointrail.screens.CategoryScreen
+import com.example.cointrail.screens.CategoryTransactionEditorScreen
+import com.example.cointrail.screens.ForgotPasswordScreen
 import com.example.cointrail.screens.LoginScreen
 import com.example.cointrail.screens.MainScreen
 import com.example.cointrail.screens.SavingPocketEditorScreen
@@ -21,10 +24,11 @@ import com.example.cointrail.screens.TabEditorScreen
 import com.example.cointrail.screens.TabScreen
 import com.example.cointrail.screens.TabsScreen
 import com.example.cointrail.screens.TransactionEditorScreen
-import com.example.cointrail.screens.TransactionScreen
+import com.example.cointrail.screens.UpdateTransactionEditorScreen
 import com.example.cointrail.viewModels.LoginViewModel
 import com.example.cointrail.viewModels.MainViewModel
 import com.example.cointrail.viewModels.SavingPocketsViewModel
+import com.example.cointrail.viewModels.StocksViewModel
 import com.example.cointrail.viewModels.TabsViewModel
 import com.example.cointrail.viewModels.TransactionViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -159,6 +163,18 @@ fun Navigation(startRoute: String) {
                 savingPocketID = savingPocketID
             )
         }
+        composable(
+            route=Screen.TabTransactionEditorScreen.route,
+            arguments = listOf(navArgument("tabID") { type = NavType.StringType })
+        ){
+            val encodedId = it.arguments?.getString("tabID") ?: ""
+            val tabID = URLDecoder.decode(encodedId, "UTF-8")
+            com.example.cointrail.screens.TabTransactionEditor(
+                viewModel = koinViewModel<TabsViewModel>(),
+                navController = navController,
+                tabID = tabID
+            )
+        }
         composable(route = Screen.SignUpScreen.route) {
             SignUpScreen(
                 viewModel = koinViewModel<LoginViewModel>(),
@@ -169,6 +185,40 @@ fun Navigation(startRoute: String) {
                 }
             )
         }
-
+        composable(route = Screen.ForgotPasswordScreen.route) {
+            ForgotPasswordScreen(
+                viewModel = koinViewModel<LoginViewModel>(),
+                onForgotPasswordClick = {
+                    navController.navigate(Screen.LoginScreen.route) {
+                        popUpTo(Screen.ForgotPasswordScreen.route) { inclusive = true }
+                    }}
+            )
+        }
+        composable(route=Screen.CategoryTransactionEditorScreen.route,
+            arguments = listOf(navArgument("categoryID") { type = NavType.StringType })
+        ){
+            val encodedId = it.arguments?.getString("categoryID") ?: ""
+            val categoryID = URLDecoder.decode(encodedId, "UTF-8")
+            CategoryTransactionEditorScreen(
+                viewModel = koinViewModel<CategoriesViewModel>(),
+                navController = navController,
+                categoryId = categoryID
+            )
+        }
+        composable(route = Screen.StocksScreen.route) {
+            com.example.cointrail.screens.StocksScreen(
+                viewModel = koinViewModel<StocksViewModel>()
+            )
+        }
+        composable(route=Screen.UpdateTransactionEditorScreen.route,
+            arguments = listOf(navArgument("transactionID") { type = NavType.StringType })) {
+            val encodedId = it.arguments?.getString("transactionID") ?: ""
+            val transactionID = URLDecoder.decode(encodedId, "UTF-8")
+            UpdateTransactionEditorScreen(
+                viewModel = koinViewModel<TransactionViewModel>(),
+                navController = navController,
+                transactionID = transactionID
+            )
+        }
     }
 }

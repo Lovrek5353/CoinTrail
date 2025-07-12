@@ -1,11 +1,13 @@
 package com.example.cointrail.modules
 
 import CategoriesViewModel
+import com.example.cointrail.network.KtorClient
 import com.example.cointrail.repository.Repository
 import com.example.cointrail.repository.RepositoryImpl
 import com.example.cointrail.viewModels.LoginViewModel
 import com.example.cointrail.viewModels.MainViewModel
 import com.example.cointrail.viewModels.SavingPocketsViewModel
+import com.example.cointrail.viewModels.StocksViewModel
 import com.example.cointrail.viewModels.TabsViewModel
 import com.example.cointrail.viewModels.TransactionViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -24,7 +26,12 @@ val viewModelModule= module {
     viewModel { TabsViewModel(repository = get()) }
     viewModel { SavingPocketsViewModel(repository = get()) }
     viewModel { TransactionViewModel(repository = get()) }
+    viewModel { StocksViewModel(repository = get()) }
 }
 
+val httpClientModule = module {
+    single { KtorClient.httpClient }
+}
 
-val appModules= listOf(repositoryModule, viewModelModule)
+val appModules= listOf(repositoryModule, viewModelModule, httpClientModule)
+

@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CoinTrailTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
-                    Navigation(startRoute = Screen.LoginScreen.route)
+                    Navigation(startRoute = Screen.StocksScreen.route)
                 }
             }
         }

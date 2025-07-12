@@ -81,7 +81,8 @@
             },
             floatingActionButton = { //navigate to CategoryScreen editor
                 FloatingActionButton(onClick = {
-                    navController.navigate(Screen.CategoryEditorScreen.route)
+                    navController.navigate(Screen.CategoryTransactionEditorScreen.createRoute(
+                        category.value!!.id))
                 }) {
                     Icon(Icons.Filled.Add, contentDescription = "Add")
                 }

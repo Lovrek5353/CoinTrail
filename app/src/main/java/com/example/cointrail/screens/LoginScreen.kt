@@ -192,7 +192,7 @@ fun LoginScreen(
             )
             TextButton(
                 onClick = {
-                    //TODO: navigate to reset password
+                    navController.navigate(Screen.ForgotPasswordScreen.route)
                 },
 
             ) {

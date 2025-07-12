@@ -31,3 +31,7 @@ val OnBackgroundDark = Color(0xFFCFD8DC)  // Light blue-gray for text on backgro
 val SurfaceDark = Color(0xFF1A3A5A)       // Slightly lighter navy for surfaces
 val OnSurfaceDark = Color(0xFFECEFF1)     // Very light blue-gray for text on surfaces
 val OutlineDark = Color(0xFF607D8B)       // Medium blue-gray for outlines
+
+
+//Custom colors
+val AccentGold = Color(0xFFFFB300) // Add to your color definitions

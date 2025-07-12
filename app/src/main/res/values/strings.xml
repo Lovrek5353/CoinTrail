@@ -45,7 +45,7 @@
     <string name="categoryName">"Category name: "</string>
     <string name="categoryDescription">"Category description: "</string>
     <string name="savingPockets">Saving Pockets</string>
-    <string name="tabs">Tab</string>
+    <string name="tabs">Tabs</string>
     <string name="transactionSavingPocket">"Transaction saving pocket: "</string>
     <string name="transactionTab">Transaction tab</string>
     <string name="newTab">Add new tab record</string>
@@ -69,4 +69,17 @@
     <string name="savingPocketDescription">Saving pocket description</string>
     <string name="savingPocketName">Saving pocket name</string>
     <string name="savingPocketTransactionAmout">Deposit amount</string>
+    <string name="forgotYourPassword">Forgot your password</string>
+    <string name="sendLink">Send reset link</string>
+    <string name="tabDate">Tab due date</string>
+    <string name="tabName">Tab name</string>
+    <string name="tabDescription">Tab description</string>
+    <string name="tabStartDate">Tab start date</string>
+    <string name="tabInterestRate">Tab interest rate</string>
+    <string name="tabMonthly">Tab monthly payment</string>
+    <string name="tabLender">Tab lender</string>
+    <string name="active">Active</string>
+    <string name="initial">initial</string>
+    <string name="tabStatus">Tab status</string>
+    <string name="updateTransaction">Update a transaction</string>
 </resources>

@@ -41,6 +41,8 @@ fun SignUpScreen(
                 LoginViewModel.UiEvent.SignUpSuccess -> {
                     onSignUpSuccess()
                 }
+
+                LoginViewModel.UiEvent.ForgotPasswordSuccess -> {}
             }
         }
     }
