@@ -1,17 +1,23 @@
 package com.example.cointrail.repository
 
 import android.util.Log
+import com.example.cointrail.data.AssetSearch
 import com.example.cointrail.data.Category
 import com.example.cointrail.data.SavingPocket
 import com.example.cointrail.data.Tab
 import com.example.cointrail.data.Transaction
 import com.example.cointrail.data.User
+import com.example.cointrail.data.toAssetSearch
+import com.example.cointrail.network.KtorClient
+import com.example.cointrail.network.StockAPI
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.ktx.toObject
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,8 +36,14 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
+import io.ktor.client.request.header
+import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 
-internal class RepositoryImpl
+
+internal class RepositoryImpl(private val stockApi: StockAPI)
     : Repository
 {
     private val _currentUser = MutableStateFlow<User?>(null)
@@ -93,8 +105,31 @@ internal class RepositoryImpl
         TODO("Not yet implemented")
     }
 
-    override fun getTransaction(): SharedFlow<Transaction> {
-        TODO("Not yet implemented")
+
+
+    private val singleTransactionFLow = mutableMapOf<String, SharedFlow<Transaction>>()
+    override fun getTransaction(id: String): SharedFlow<Transaction> {
+        return singleTransactionFLow.getOrPut(id){
+            callbackFlow {
+                val docRef = transactionsReference.document(id)
+                val registration = docRef.addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        close(error)
+                        return@addSnapshotListener
+                    }
+                    val transaction = snapshot?.toObject(Transaction::class.java)?.copy(id = snapshot.id)
+                    if (transaction != null) {
+                        trySend(transaction)
+                    }
+                }
+                awaitClose { registration.remove() }
+            }
+                .shareIn(
+                    scope=repositoryScope,
+                    started = SharingStarted.WhileSubscribed(5000),
+                    replay = 1
+                )
+        }
     }
 
 
@@ -159,8 +194,24 @@ internal class RepositoryImpl
         }
     }
 
-    override fun updateTransaction(transaction: Transaction) {
-        TODO("Not yet implemented")
+    override suspend fun updateTransaction(transaction: Transaction) {
+        Log.d("TransactionRepository", "Updating transaction: $transaction")
+
+        val docRef = transactionsReference.document(transaction.id ?: return)
+
+        // Prepare the data map (excluding nulls)
+        val updatedData: MutableMap<String, Any> = hashMapOf(
+            "amount" to transaction.amount,
+            "categoryId" to transaction.categoryId,
+            "date" to transaction.date!!, // Ensure non-null if required
+            "description" to transaction.description,
+           "type" to transaction.type.name,
+            "userID" to transaction.userID
+        )
+
+        // Update the document
+        docRef.update(updatedData).await()
+        Log.d("TransactionRepository", "Transaction updated successfully")
     }
 
     override suspend fun deleteTransaction(transactionID: String): Result<Unit> {
@@ -190,10 +241,10 @@ internal class RepositoryImpl
         )
         if (tabSnapshot.exists()) {
             val currentBalance = tabSnapshot.getDouble("outstandingBalance") ?: 0.0
-            val newBalance = currentBalance - transactionAmount
+            val newBalance = maxOf(currentBalance - transactionAmount, 0.0)
             Log.d(
                 "UpdateBalance",
-                "Tab found. Current outstandingBalance: $currentBalance, New outstandingBalance: $newBalance"
+                "Tab found. Current outstandingBalance: $currentBalance, New outstandingBalance (clamped): $newBalance"
             )
             tabReference.update("outstandingBalance", newBalance).await()
             Log.d(
@@ -211,10 +262,10 @@ internal class RepositoryImpl
         )
         if (pocketSnapshot.exists()) {
             val currentBalance = pocketSnapshot.getDouble("balance") ?: 0.0
-            val newBalance = currentBalance - transactionAmount
+            val newBalance = maxOf(currentBalance - transactionAmount, 0.0)
             Log.d(
                 "UpdateBalance",
-                "SavingPocket found. Current balance: $currentBalance, New balance: $newBalance"
+                "SavingPocket found. Current balance: $currentBalance, New balance (clamped): $newBalance"
             )
             pocketReference.update("balance", newBalance).await()
             Log.d(
@@ -230,6 +281,74 @@ internal class RepositoryImpl
             "Document $documentId not found in either tabs or savingPockets. No update performed."
         )
     }
+
+
+    override suspend fun updateBalanceAfterTransactionEdit(
+        documentId: String,
+        oldAmount: Double,
+        newAmount: Double
+    ) {
+        val tabReference = tabsReference.document(documentId)
+        val pocketReference = savingPocketsReference.document(documentId)
+
+        Log.d(
+            "UpdateBalance",
+            "Starting updateBalanceAfterTransactionEdit for documentId: $documentId, oldAmount: $oldAmount, newAmount: $newAmount"
+        )
+
+        // Calculate the difference (positive or negative)
+        val difference = newAmount - oldAmount
+
+        // Try tabs first
+        val tabSnapshot = tabReference.get().await()
+        Log.d(
+            "UpdateBalance",
+            "Checked tabs collection for $documentId. Exists: ${tabSnapshot.exists()}"
+        )
+        if (tabSnapshot.exists()) {
+            val currentBalance = tabSnapshot.getDouble("outstandingBalance") ?: 0.0
+            val newBalance = maxOf(currentBalance + difference, 0.0)
+            Log.d(
+                "UpdateBalance",
+                "Tab found. Current outstandingBalance: $currentBalance, New outstandingBalance (clamped): $newBalance"
+            )
+            tabReference.update("outstandingBalance", newBalance).await()
+            Log.d(
+                "UpdateBalance",
+                "Updated outstandingBalance in tabs for $documentId to $newBalance"
+            )
+            return
+        }
+
+        // If not found in tabs, try savingPockets
+        val pocketSnapshot = pocketReference.get().await()
+        Log.d(
+            "UpdateBalance",
+            "Checked savingPockets collection for $documentId. Exists: ${pocketSnapshot.exists()}"
+        )
+        if (pocketSnapshot.exists()) {
+            val currentBalance = pocketSnapshot.getDouble("balance") ?: 0.0
+            val newBalance = maxOf(currentBalance + difference, 0.0)
+            Log.d(
+                "UpdateBalance",
+                "SavingPocket found. Current balance: $currentBalance, New balance (clamped): $newBalance"
+            )
+            pocketReference.update("balance", newBalance).await()
+            Log.d(
+                "UpdateBalance",
+                "Updated balance in savingPockets for $documentId to $newBalance"
+            )
+            return
+        }
+
+        // If neither exists
+        Log.w(
+            "UpdateBalance",
+            "Document $documentId not found in either tabs or savingPockets. No update performed."
+        )
+    }
+
+
 
 
     override suspend fun addSavingPocketTransaction(transaction: Transaction) {
@@ -591,5 +710,20 @@ internal class RepositoryImpl
             Log.e("UserRepository", "Error fetching user", e)
             throw e
         }
+    }
+
+    override fun searchAssets(query: String): SharedFlow<List<AssetSearch>> {
+        return flow{
+            emit(stockApi.searchAsset(query).body.map{it.toAssetSearch()})
+        }
+            .catch { e ->
+                // Handle error: emit an empty list or log as needed
+                emit(emptyList())
+            }
+            .shareIn(
+                flowScope,
+                SharingStarted.WhileSubscribed(5000),
+                replay = 1
+                )
     }
 }

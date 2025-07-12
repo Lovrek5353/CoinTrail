@@ -24,9 +24,11 @@ import com.example.cointrail.screens.TabEditorScreen
 import com.example.cointrail.screens.TabScreen
 import com.example.cointrail.screens.TabsScreen
 import com.example.cointrail.screens.TransactionEditorScreen
+import com.example.cointrail.screens.UpdateTransactionEditorScreen
 import com.example.cointrail.viewModels.LoginViewModel
 import com.example.cointrail.viewModels.MainViewModel
 import com.example.cointrail.viewModels.SavingPocketsViewModel
+import com.example.cointrail.viewModels.StocksViewModel
 import com.example.cointrail.viewModels.TabsViewModel
 import com.example.cointrail.viewModels.TransactionViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -201,6 +203,21 @@ fun Navigation(startRoute: String) {
                 viewModel = koinViewModel<CategoriesViewModel>(),
                 navController = navController,
                 categoryId = categoryID
+            )
+        }
+        composable(route = Screen.StocksScreen.route) {
+            com.example.cointrail.screens.StocksScreen(
+                viewModel = koinViewModel<StocksViewModel>()
+            )
+        }
+        composable(route=Screen.UpdateTransactionEditorScreen.route,
+            arguments = listOf(navArgument("transactionID") { type = NavType.StringType })) {
+            val encodedId = it.arguments?.getString("transactionID") ?: ""
+            val transactionID = URLDecoder.decode(encodedId, "UTF-8")
+            UpdateTransactionEditorScreen(
+                viewModel = koinViewModel<TransactionViewModel>(),
+                navController = navController,
+                transactionID = transactionID
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.example.cointrail.repository
 
+import com.example.cointrail.data.AssetSearch
 import com.example.cointrail.data.Category
 import com.example.cointrail.data.SavingPocket
 import com.example.cointrail.data.Tab
@@ -16,16 +17,21 @@ interface Repository {
 
     fun getAllTransactionsByUser(): SharedFlow<List<Transaction>>
     fun getTransactions(): SharedFlow<List<Transaction>>
-    fun getTransaction(): SharedFlow<Transaction>
+    fun getTransaction(id: String): SharedFlow<Transaction>
 
     fun getCategoryTransactions(categoryId: String): SharedFlow<List<Transaction>>
     fun getTabTransactions(tabId: String): SharedFlow<List<Transaction>>
 
     suspend fun addTransaction(transaction: Transaction)
-    fun updateTransaction(transaction: Transaction)
+    suspend fun updateTransaction(transaction: Transaction)
     suspend fun deleteTransaction(transactionID: String): Result<Unit>
 
     suspend fun updateBalanceAfterDeletion(documentId: String, newBalance: Double)
+    suspend fun updateBalanceAfterTransactionEdit(
+        documentId: String,
+        oldAmount: Double,
+        newAmount: Double
+    )
 
     suspend fun addSavingPocketTransaction(transaction: Transaction)
     suspend fun updateSavingPocketBalance(savingPocketID: String, newBalance: Double)
@@ -61,6 +67,7 @@ interface Repository {
 
     suspend fun fetchUserByEmail(email: String)
 
+    fun searchAssets(query: String): SharedFlow<List<AssetSearch>>
 
 
 }

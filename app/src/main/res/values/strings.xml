@@ -81,4 +81,5 @@
     <string name="active">Active</string>
     <string name="initial">initial</string>
     <string name="tabStatus">Tab status</string>
+    <string name="updateTransaction">Update a transaction</string>
 </resources>

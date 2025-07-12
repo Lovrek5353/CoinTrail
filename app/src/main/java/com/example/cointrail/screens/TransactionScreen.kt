@@ -17,6 +17,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.cointrail.data.Transaction
 import com.example.cointrail.data.enums.TransactionType
+import com.example.cointrail.navigation.Screen
 import com.example.cointrail.viewModels.TransactionViewModel
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.collectLatest
@@ -121,7 +122,7 @@ fun TransactionScreen(
                             )
                         }
                         IconButton(
-                            onClick = { /* Handle edit */ },
+                            onClick = { navController.navigate(Screen.UpdateTransactionEditorScreen.createRoute(transactionID)) },
                             modifier = Modifier.size(36.dp)
                         ) {
                             Icon(
