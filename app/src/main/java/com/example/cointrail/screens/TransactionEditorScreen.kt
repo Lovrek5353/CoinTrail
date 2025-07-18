@@ -278,9 +278,9 @@ fun TransactionEditorScreen(
 @Preview
 @Composable
 fun TransactionEditorScreenPreview(){
-    val viewModel=MainViewModel(repository = RepositoryImpl())
-    val navController= rememberNavController()
-    CoinTrailTheme {
-        TransactionEditorScreen(viewModel = viewModel, navController = navController)
-    }
+//    val viewModel=MainViewModel(repository = RepositoryImpl())
+//    val navController= rememberNavController()
+//    CoinTrailTheme {
+//        TransactionEditorScreen(viewModel = viewModel, navController = navController)
+//    }
 }

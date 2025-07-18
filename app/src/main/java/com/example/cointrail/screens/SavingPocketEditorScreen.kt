@@ -236,12 +236,12 @@ fun SavingPocketEditorScreen(
 @Composable
 fun SavingPocketEditorScreenPreview(){
 
-    val viewModel=SavingPocketsViewModel(repository = RepositoryImpl())
-    val navController= rememberNavController()
-    CoinTrailTheme {
-        SavingPocketEditorScreen(
-            viewModel = viewModel,
-            navController = navController
-        )
-    }
+//    val viewModel=SavingPocketsViewModel(repository = RepositoryImpl())
+//    val navController= rememberNavController()
+//    CoinTrailTheme {
+//        SavingPocketEditorScreen(
+//            viewModel = viewModel,
+//            navController = navController
+//        )
+//    }
 }

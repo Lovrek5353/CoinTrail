@@ -5,19 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="TabSummaryPreview">
+      <SelectionState runConfigName="StockDetailsScreenPreview (1)">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="TabScreenPreview">
+      <SelectionState runConfigName="AssetHistoryLineGraphPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ProgressIndicatorPreview">
+      <SelectionState runConfigName="HistoryLineGraphPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="HalfCircleProgressIndicatorPreview">
+      <SelectionState runConfigName="PieChartPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ProgressIndicatorPreview (1)">
+      <SelectionState runConfigName="PreviewTransactionsByMonthGraph">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

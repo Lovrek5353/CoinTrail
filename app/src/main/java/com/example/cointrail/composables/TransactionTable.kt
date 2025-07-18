@@ -2,6 +2,7 @@ package com.example.cointrail.composables
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,7 +26,10 @@ import java.time.LocalDate
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TransactionsTable(transactions: List<Transaction>) {
+fun TransactionsTable(
+    transactions: List<Transaction>,
+    onTransactionClick: (categoryID: String, transactionID: String) -> Unit = { categoryID, transactionID -> }
+) {
     val configuration = LocalConfiguration.current
     val tableHeight = (configuration.screenHeightDp.dp) / 2
 
@@ -88,7 +92,10 @@ fun TransactionsTable(transactions: List<Transaction>) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = dimensionResource(R.dimen.padding6)),
+                        .padding(vertical = dimensionResource(R.dimen.padding6))
+                        .clickable { onTransactionClick(transaction.categoryId,
+                        transaction.id.toString()
+                ) },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(

@@ -135,12 +135,12 @@ fun ForgotPasswordScreen(
 @Preview
 @Composable
 fun ForgotPasswordScreenPreview(){
-    val viewModel=LoginViewModel(repository = RepositoryImpl())
-    CoinTrailTheme {
-        ForgotPasswordScreen(
-            viewModel = viewModel,
-            onForgotPasswordClick = {}
-        )
-
-    }
+//    val viewModel=LoginViewModel(repository = RepositoryImpl())
+//    CoinTrailTheme {
+//        ForgotPasswordScreen(
+//            viewModel = viewModel,
+//            onForgotPasswordClick = {}
+//        )
+//
+//    }
 }

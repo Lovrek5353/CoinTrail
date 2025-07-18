@@ -137,13 +137,13 @@ fun TabScreen(
 @Preview
 @Composable
 fun TabScreenPreview(){
-    val viewModel = TabsViewModel(repository = RepositoryImpl())
-    val navController = rememberNavController()
-    CoinTrailTheme {
-        TabScreen(
-            tabID = "1",
-            viewModel = viewModel,
-            navController = navController
-        )
-    }
+//    val viewModel = TabsViewModel(repository = RepositoryImpl())
+//    val navController = rememberNavController()
+//    CoinTrailTheme {
+//        TabScreen(
+//            tabID = "1",
+//            viewModel = viewModel,
+//            navController = navController
+//        )
+//    }
 }

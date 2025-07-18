@@ -82,4 +82,13 @@
     <string name="initial">initial</string>
     <string name="tabStatus">Tab status</string>
     <string name="updateTransaction">Update a transaction</string>
+    <string name="assetSearch">Asset search</string>
+    <string name="transactions">Transactions</string>
+    <string name="spending_over_time">Spending over time</string>
+    <string name="total_spending_by_category">Total spending by category</string>
+    <string name="Analytics">Analytics</string>
+    <string name="transactionPerType">Total transactions per transaction type</string>
+    <string name="financeManagement">Portfolio comparison</string>
+    <string name="spendingHabitsMonth">Spending habits per month</string>
+    <string name="spendinghabits">Spending habits</string>
 </resources>

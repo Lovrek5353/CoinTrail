@@ -139,10 +139,10 @@ fun CategoryEditorScreen(
 @Preview(showBackground = true)
 @Composable
 fun CategoryEditorScreenPreview() {
-    CoinTrailTheme {
-        CategoryEditorScreen(
-            viewModel = CategoriesViewModel(RepositoryImpl()),
-            navController = rememberNavController()
-        )
-    }
+//    CoinTrailTheme {
+//        CategoryEditorScreen(
+//            viewModel = CategoriesViewModel(RepositoryImpl()),
+//            navController = rememberNavController()
+//        )
+//    }
 }

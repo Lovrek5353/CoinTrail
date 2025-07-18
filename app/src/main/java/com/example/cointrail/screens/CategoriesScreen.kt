@@ -98,12 +98,12 @@ fun CategoriesScreen(
 @Preview
 @Composable
 fun CategoriesScreenPreview() {
-    val navController = rememberNavController()
-    val viewModel = CategoriesViewModel(repository = RepositoryImpl())
-    CoinTrailTheme {
-        CategoriesScreen(
-            navController = navController,
-            viewModel = viewModel
-        )
-    }
+//    val navController = rememberNavController()
+//    val viewModel = CategoriesViewModel(repository = RepositoryImpl())
+//    CoinTrailTheme {
+//        CategoriesScreen(
+//            navController = navController,
+//            viewModel = viewModel
+//        )
+//    }
 }

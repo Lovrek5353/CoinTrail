@@ -422,12 +422,12 @@ fun TabEditorScreen(
 @Composable
 
 fun TabEditorScreenPreview() {
-    val navController=rememberNavController()
-    val viewModel = TabsViewModel(repository = RepositoryImpl())
-    CoinTrailTheme {
-        TabEditorScreen(
-            viewModel = viewModel,
-            navController = navController
-        )
-    }
+//    val navController=rememberNavController()
+//    val viewModel = TabsViewModel(repository = RepositoryImpl())
+//    CoinTrailTheme {
+//        TabEditorScreen(
+//            viewModel = viewModel,
+//            navController = navController
+//        )
+//    }
 }

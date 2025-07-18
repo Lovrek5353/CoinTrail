@@ -2,8 +2,9 @@ package com.example.cointrail.data
 
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.Timestamp
-import kotlinx.serialization.Serializable
 
+
+//Used for ETF & Indexes
 data class Asset(
     @DocumentId var id: String? = null,
     val name: String="",
@@ -28,15 +29,23 @@ data class Asset(
 data class AssetSearch(
     val symbol: String,
     val name: String,
-    val exchange: String,
-    val type: String,
     val exchDisp: String,
+    val typeDispl: String,
 )
 
 fun StockSymbol.toAssetSearch()=AssetSearch(
     symbol=symbol,
-    name=name,
-    exchange=exch,
-    type=type,
-    exchDisp=exchDisp
+    name=shortname,
+    exchDisp=exchDisp,
+    typeDispl=typeDisp
+)
+
+data class AssetHistory(
+    val date: Long,
+    val price: Double
+)
+
+fun BodyItem.toAssetHistory()=AssetHistory(
+    date =timestamp_unix,
+    price =close
 )

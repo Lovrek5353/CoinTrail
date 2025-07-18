@@ -1,8 +1,10 @@
 package com.example.cointrail.navigation
 
+import AnalyticsViewModel
 import CategoriesViewModel
 import CategoryEditorScreen
 import SignUpScreen
+import StockDetailsScreen
 import TransactionScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
@@ -10,6 +12,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.cointrail.screens.AnalyticsScreen
+import com.example.cointrail.screens.AssetSearchScreen
 import com.example.cointrail.screens.CategoriesScreen
 import com.example.cointrail.screens.CategoryScreen
 import com.example.cointrail.screens.CategoryTransactionEditorScreen
@@ -25,6 +29,7 @@ import com.example.cointrail.screens.TabScreen
 import com.example.cointrail.screens.TabsScreen
 import com.example.cointrail.screens.TransactionEditorScreen
 import com.example.cointrail.screens.UpdateTransactionEditorScreen
+
 import com.example.cointrail.viewModels.LoginViewModel
 import com.example.cointrail.viewModels.MainViewModel
 import com.example.cointrail.viewModels.SavingPocketsViewModel
@@ -218,6 +223,28 @@ fun Navigation(startRoute: String) {
                 viewModel = koinViewModel<TransactionViewModel>(),
                 navController = navController,
                 transactionID = transactionID
+            )
+        }
+        composable(route=Screen.AssetSearchScreen.route){
+            AssetSearchScreen(
+                viewModel = koinViewModel<StocksViewModel>(),
+                navController = navController
+            )
+        }
+        composable(route= Screen.StockDetailsScreen.route,
+            arguments = listOf(navArgument("stockSymbol") { type = NavType.StringType })) {
+            val encodedId = it.arguments?.getString("stockSymbol") ?: ""
+            val stockSymbol = URLDecoder.decode(encodedId, "UTF-8")
+            StockDetailsScreen(
+                stockSymbol = stockSymbol,
+                viewModel = koinViewModel<StocksViewModel>(),
+                navController = navController
+            )
+        }
+        composable(route=Screen.AnalyticsScreen.route) {
+            AnalyticsScreen(
+                viewModel = koinViewModel<AnalyticsViewModel>(),
+                navController = navController
             )
         }
     }

@@ -1,13 +1,17 @@
 package com.example.cointrail.repository
 
 import android.util.Log
+import com.example.cointrail.data.AssetHistory
 import com.example.cointrail.data.AssetSearch
 import com.example.cointrail.data.Category
 import com.example.cointrail.data.SavingPocket
+import com.example.cointrail.data.Stock
 import com.example.cointrail.data.Tab
 import com.example.cointrail.data.Transaction
 import com.example.cointrail.data.User
+import com.example.cointrail.data.toAssetHistory
 import com.example.cointrail.data.toAssetSearch
+import com.example.cointrail.data.toStock
 import com.example.cointrail.network.KtorClient
 import com.example.cointrail.network.StockAPI
 import com.google.firebase.Firebase
@@ -40,7 +44,9 @@ import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 
 internal class RepositoryImpl(private val stockApi: StockAPI)
@@ -66,35 +72,141 @@ internal class RepositoryImpl(private val stockApi: StockAPI)
 
 
     // Singleton SharedFlow for all collectors
-    val transactionSharedFlow: SharedFlow<List<Transaction>> by lazy {
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -60)
-        val date = Timestamp(calendar.time)
+    override val transactionSharedFlow: SharedFlow<List<Transaction>> =
+        currentUser
+            .flatMapLatest { user ->
+                if (user?.id == null) {
+                    flowOf(emptyList()) // don't load anything if user is not available
+                } else {
+                    val calendar = Calendar.getInstance()
+                    calendar.add(Calendar.DAY_OF_YEAR, -60)
+                    val date = Timestamp(calendar.time)
 
-        callbackFlow<List<Transaction>> {
-            val query = transactionsReference
-                .whereGreaterThanOrEqualTo("date", date)
-                .whereEqualTo("userID", currentUser.value?.id ?: "")
+                    Log.d("Repo", "Firestore query for userID=${user.id}, date >= $date")
 
-            val registration = query.addSnapshotListener { value, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
+                    callbackFlow<List<Transaction>> {
+                        val query = transactionsReference
+                            .whereGreaterThanOrEqualTo("date", date)
+                            .whereEqualTo("userID", user.id)
+
+                        val registration = query.addSnapshotListener { value, error ->
+                            if (error != null) {
+                                Log.e("Repo", "Firestore error: $error")
+                                close(error)
+                                return@addSnapshotListener
+                            }
+                            val transactions = value?.documents?.mapNotNull { doc ->
+                                doc.toObject(Transaction::class.java)?.copy(id = doc.id)
+                            } ?: emptyList()
+
+                            Log.d("Repo", "Fetched ${transactions.size} transactions from Firestore.")
+                            trySend(transactions).isSuccess
+                        }
+
+                        awaitClose { registration.remove() }
+                    }
                 }
-                val transactions = value?.documents?.mapNotNull { doc ->
-                    doc.toObject(Transaction::class.java)
-                } ?: emptyList()
-                trySend(transactions).isSuccess
             }
+            .shareIn(
+                scope = repositoryScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                replay = 1
+            )
 
-            awaitClose { registration.remove() }
-        }.shareIn(
-            scope = repositoryScope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-            replay = 1
-        )
-    }
+    override val categoriesSharedFlow: SharedFlow<List<Category>> =
+        currentUser
+            .flatMapLatest { user ->
+                if (user?.id == null) {
+                    flowOf(emptyList()) // don't load anything if user is not available
+                } else {
+                    callbackFlow<List<Category>> {
+                        val query = allCategoriesReference
+                            .whereEqualTo("userId", user.id)
+                        val registration = query.addSnapshotListener { value, error ->
+                            if (error != null) {
+                                Log.e("Repo", "Firestore error: $error")
+                                close(error)
+                                return@addSnapshotListener
+                            }
+                            val categories = value?.documents?.mapNotNull { doc ->
+                                doc.toObject(Category::class.java)?.copy(id = doc.id)
+                            } ?: emptyList()
+                            Log.d("Categories",categories.toString())
+                            Log.d("Repo", "Fetched ${categories.size} categories from Firestore.")
+                            trySend(categories).isSuccess
+                        }
+                        awaitClose { registration.remove() }
+                    }
+                }
+            }
+            .shareIn(
+                scope = repositoryScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                replay = 1
+            )
 
+    override val tabsGeneralFlow: SharedFlow<List<Tab>> =
+        currentUser
+            .flatMapLatest { user ->
+                if (user?.id == null) {
+                    flowOf(emptyList()) // don't load anything if user is not available
+                } else {
+                    callbackFlow<List<Tab>> {
+                        val query = tabsReference
+                            .whereEqualTo("userID", user.id)
+                        val registration = query.addSnapshotListener { value, error ->
+                            if (error != null) {
+                                Log.e("Repo", "Firestore error: $error")
+                                close(error)
+                                return@addSnapshotListener
+                            }
+                            val tabs = value?.documents?.mapNotNull { doc ->
+                                doc.toObject(Tab::class.java)?.copy(id = doc.id)
+                            } ?: emptyList()
+                            Log.d("Categories",tabs.toString())
+                            Log.d("Repo", "Fetched ${tabs.size} categories from Firestore.")
+                            trySend(tabs).isSuccess
+                        }
+                        awaitClose { registration.remove() }
+                    }
+                }
+            }
+            .shareIn(
+                scope = repositoryScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                replay = 1
+            )
+    override val savingPocketsGeneralFlow: SharedFlow<List<SavingPocket>> =
+        currentUser
+            .flatMapLatest { user ->
+                if (user?.id == null) {
+                    flowOf(emptyList()) // don't load anything if user is not available
+                } else {
+                    callbackFlow<List<SavingPocket>> {
+                        val query = savingPocketsReference
+                            .whereEqualTo("userID", user.id)
+                        val registration = query.addSnapshotListener { value, error ->
+                            if (error != null) {
+                                Log.e("Repo", "Firestore error: $error")
+                                close(error)
+                                return@addSnapshotListener
+                            }
+                            val savingPockets = value?.documents?.mapNotNull { doc ->
+                                doc.toObject(SavingPocket::class.java)?.copy(id = doc.id)
+                            } ?: emptyList()
+                            Log.d("Categories",savingPockets.toString())
+                            Log.d("Repo", "Fetched ${savingPockets.size} categories from Firestore.")
+                            trySend(savingPockets).isSuccess
+                        }
+                        awaitClose { registration.remove() }
+                    }
+                }
+            }
+            .shareIn(
+                scope = repositoryScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                replay = 1
+            )
 
     fun getAllTransactions(): SharedFlow<List<Transaction>> {
         return transactionSharedFlow
@@ -538,7 +650,7 @@ internal class RepositoryImpl(private val stockApi: StockAPI)
 
     val tabsSharedFlow: SharedFlow<List<Tab>> by lazy {
         callbackFlow <List<Tab>> {
-            val query = db.collection("tabs")
+            val query = tabsReference
                 .whereEqualTo("userID", currentUser.value?.id)
             val registration = query.addSnapshotListener { value, error ->
                 if (error != null) {
@@ -712,18 +824,43 @@ internal class RepositoryImpl(private val stockApi: StockAPI)
         }
     }
 
-    override fun searchAssets(query: String): SharedFlow<List<AssetSearch>> {
-        return flow{
-            emit(stockApi.searchAsset(query).body.map{it.toAssetSearch()})
+    override fun searchAssets(query: String): Flow<List<AssetSearch>> {
+        return flow {
+            val response = stockApi.searchAsset(query)
+            val body = response.body ?: emptyList()
+            emit(body.map { it.toAssetSearch() })
+        }.catch { e ->
+            // Optionally log the error for debugging
+            emit(emptyList())
+        }.flowOn(Dispatchers.IO)
+    }
+    override fun fetchAssetDetails(symbol: String, type: String): Flow<Stock> {
+        return flow {
+            val response = stockApi.getAssetDetails(symbol, type)
+            Log.d("Response", response.toString())
+            val stock = response.body?.toStock() ?: Stock()
+            Log.d("Stock", stock.toString())
+            emit(stock)
+            Log.d("StockSent",stock.toString())
+        }.catch { e ->
+            Log.d("ErrorLog", e.toString())
+            // Optionally log the error
+            emit(Stock())
+        }.flowOn(Dispatchers.IO)
+    }
+
+    override fun fetchAssetHistory(symbol: String): Flow<List<AssetHistory>> {
+        return flow<List<AssetHistory>> {
+            val response=stockApi.fetchAssetHistory(symbol)
+            Log.d("Response", response.toString())
+            val body=response.body
+            Log.d("History", body.toString())
+            emit(body.map { it.toAssetHistory() })
+            Log.d("History", body.toString())
+        }.catch { e ->
+            Log.d("ErrorLog", e.toString())
+            // Optionally log the error
+            emit(emptyList())
         }
-            .catch { e ->
-                // Handle error: emit an empty list or log as needed
-                emit(emptyList())
-            }
-            .shareIn(
-                flowScope,
-                SharingStarted.WhileSubscribed(5000),
-                replay = 1
-                )
     }
 }
