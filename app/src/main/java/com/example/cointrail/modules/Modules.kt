@@ -2,9 +2,15 @@ package com.example.cointrail.modules
 
 import AnalyticsViewModel
 import CategoriesViewModel
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.example.cointrail.network.KtorClient
 import com.example.cointrail.network.StockAPI
 import com.example.cointrail.network.StockAPIImpl
+import com.example.cointrail.notification.NotificationPreferencesRepository
+import com.example.cointrail.notification.NotificationScheduler
+import com.example.cointrail.notification.NotificationViewModel
+import com.example.cointrail.notification.dataStore
 import com.example.cointrail.repository.Repository
 import com.example.cointrail.repository.RepositoryImpl
 import com.example.cointrail.viewModels.LoginViewModel
@@ -13,6 +19,7 @@ import com.example.cointrail.viewModels.SavingPocketsViewModel
 import com.example.cointrail.viewModels.StocksViewModel
 import com.example.cointrail.viewModels.TabsViewModel
 import com.example.cointrail.viewModels.TransactionViewModel
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -22,9 +29,26 @@ val apiModule = module {
     }
 }
 
+val notificationModule = module {
+
+    // Provide NotificationPreferencesRepository (assuming you provide DataStore elsewhere)
+    single { NotificationPreferencesRepository(get()) }
+
+    // Provide NotificationScheduler
+    single { NotificationScheduler() }
+
+    // Provide NotificationViewModel with injected dependencies
+    viewModel { NotificationViewModel(preferencesRepository = get(), notificationScheduler = get()) }
+}
+
 val repositoryModule= module{
     single<Repository>{
         RepositoryImpl(get())
+    }
+}
+val dataStoreModule = module {
+    single {
+        androidContext().dataStore
     }
 }
 
@@ -37,11 +61,12 @@ val viewModelModule= module {
     viewModel { TransactionViewModel(repository = get()) }
     viewModel { StocksViewModel(repository = get()) }
     viewModel { AnalyticsViewModel(repository = get())}
+    viewModel { NotificationViewModel(preferencesRepository = get(), notificationScheduler = get()) }
 }
 
 val httpClientModule = module {
     single { KtorClient.httpClient }
 }
 
-val appModules= listOf(repositoryModule, viewModelModule, httpClientModule, apiModule)
+val appModules= listOf(repositoryModule, viewModelModule, httpClientModule, apiModule, notificationModule, dataStoreModule)
 

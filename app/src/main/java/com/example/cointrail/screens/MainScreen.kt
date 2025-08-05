@@ -80,7 +80,7 @@ fun MainScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { navController.navigate(Screen.AccountScreen.route) }) {
+                    IconButton(onClick = { navController.navigate(Screen.NotificationScreen.route) }) { //vrati AccountScreen, probaj kombinirat screenove
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = stringResource(id = R.string.settingsIcon),

@@ -64,4 +64,6 @@ sealed class Screen (val route: String) {
     data object AccountEditorScreen: Screen("account_editor_screen")
 
     data object PortfolioScreen: Screen("portfolio")
+
+    data object NotificationScreen: Screen("notification_screen")
 }

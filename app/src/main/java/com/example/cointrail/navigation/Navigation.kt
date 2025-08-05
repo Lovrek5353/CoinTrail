@@ -3,6 +3,7 @@ package com.example.cointrail.navigation
 import AnalyticsViewModel
 import CategoriesViewModel
 import CategoryEditorScreen
+import NotificationScreen
 import SignUpScreen
 import StockDetailsScreen
 import TransactionScreen
@@ -12,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.cointrail.notification.NotificationViewModel
 import com.example.cointrail.screens.AnalyticsScreen
 import com.example.cointrail.screens.AccountScreen
 import com.example.cointrail.screens.AssetSearchScreen
@@ -271,6 +273,9 @@ fun Navigation(startRoute: String) {
             WelcomeScreen(
                 navController = navController,
             )
+        }
+        composable(route=Screen.NotificationScreen.route) {
+            NotificationScreen(viewModel = koinViewModel<NotificationViewModel>())
         }
     }
 }
