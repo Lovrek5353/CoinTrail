@@ -14,8 +14,10 @@ import com.example.cointrail.data.toAssetSearch
 import com.example.cointrail.data.toStock
 import com.example.cointrail.network.KtorClient
 import com.example.cointrail.network.StockAPI
+import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
@@ -42,6 +44,7 @@ import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emptyFlow
@@ -52,6 +55,8 @@ import kotlinx.coroutines.flow.flowOn
 internal class RepositoryImpl(private val stockApi: StockAPI)
     : Repository
 {
+
+
     private val _currentUser = MutableStateFlow<User?>(null)
     override val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
     override fun getAllTransactionsByUser(): SharedFlow<List<Transaction>> {
@@ -59,7 +64,7 @@ internal class RepositoryImpl(private val stockApi: StockAPI)
     }
 
     private val flowScope = CoroutineScope(Dispatchers.Default)
-    private val repositoryScope= CoroutineScope(Dispatchers.IO+ SupervisorJob())
+    private var repositoryScope= CoroutineScope(Dispatchers.IO+ SupervisorJob())
 
     private val db= Firebase.firestore
     private val auth= FirebaseAuth.getInstance()
@@ -646,6 +651,21 @@ internal class RepositoryImpl(private val stockApi: StockAPI)
 
     override fun signOut() {
         auth.signOut()
+        repositoryScope.cancel() // Cancel running coroutines
+        repositoryScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+        // Clear cached flows or caches safely
+        singleTransactionFLow.clear() // if this is a mutable cache structure, otherwise remove it
+        transactionFlows.clear()
+
+        // Update _currentUser on Main thread
+        CoroutineScope(Dispatchers.Main).launch {
+            _currentUser.value = null
+        }
+    }
+
+    override fun deleteData(userID: String?) {
+        TODO("Not yet implemented")
     }
 
     val tabsSharedFlow: SharedFlow<List<Tab>> by lazy {
@@ -863,4 +883,64 @@ internal class RepositoryImpl(private val stockApi: StockAPI)
             emit(emptyList())
         }
     }
+    override suspend fun signInWithGoogle(idToken: String): Result<User> {
+        Log.d("signInWithGoogle", "Start sign-in with Google, idToken length: ${idToken.length}")
+        return try {
+            // 1. Build credential from Google ID token
+            val credential = com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, null)
+            Log.d("signInWithGoogle", "Credential created")
+
+            // 2. Sign in to Firebase Auth with the credential
+            val authResult = try {
+                auth.signInWithCredential(credential).await()
+            } catch (e: Exception) {
+                Log.e("signInWithGoogle", "Firebase signInWithCredential failed", e)
+                throw e
+            }
+            val firebaseUser = authResult.user ?: run {
+                val msg = "Firebase Auth failed: no user returned"
+                Log.e("signInWithGoogle", msg)
+                throw Exception(msg)
+            }
+            Log.d("signInWithGoogle", "Firebase user obtained: uid = ${firebaseUser.uid}, email = ${firebaseUser.email}")
+
+            val email = firebaseUser.email ?: run {
+                val msg = "No email returned by Google account"
+                Log.e("signInWithGoogle", msg)
+                throw Exception(msg)
+            }
+            Log.d("signInWithGoogle", "User email: $email")
+
+            // 3. Search Firestore 'users' collection by email
+            val querySnapshot = try {
+                usersReference.whereEqualTo("email", email).get().await()
+            } catch (e: Exception) {
+                Log.e("signInWithGoogle", "Firestore query failed", e)
+                throw e
+            }
+            Log.d("signInWithGoogle", "Firestore query completed. Found ${querySnapshot.size()} documents")
+
+            return if (!querySnapshot.isEmpty) {
+                val doc = querySnapshot.documents.first()
+                val user = try {
+                    doc.toObject(User::class.java)?.copy(id = doc.id) ?: throw Exception("Failed to parse User from Firestore")
+                } catch (e: Exception) {
+                    Log.e("signInWithGoogle", "User parsing error", e)
+                    throw e
+                }
+                Log.d("signInWithGoogle", "User found in Firestore with id=${user.id}")
+                _currentUser.value = user
+                Result.success(user)
+            } else {
+                val warningMsg = "No user found in Firestore with email: $email"
+                Log.w("signInWithGoogle", warningMsg)
+                Result.failure(Exception(warningMsg))
+            }
+        } catch (e: Exception) {
+            Log.e("signInWithGoogle", "Failed Google sign-in", e)
+            Result.failure(e)
+        }
+    }
+
+
 }

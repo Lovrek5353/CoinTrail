@@ -57,6 +57,7 @@ fun ForgotPasswordScreen(
                     onForgotPasswordClick()
                 }
                 LoginViewModel.UiEvent.SignUpSuccess -> {}
+                else -> {}
             }
         }
     }

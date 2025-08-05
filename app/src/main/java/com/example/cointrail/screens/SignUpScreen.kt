@@ -43,6 +43,7 @@ fun SignUpScreen(
                 }
 
                 LoginViewModel.UiEvent.ForgotPasswordSuccess -> {}
+                else -> {}
             }
         }
     }

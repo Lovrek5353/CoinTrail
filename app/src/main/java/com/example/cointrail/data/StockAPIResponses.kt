@@ -1,6 +1,7 @@
 package com.example.cointrail.data
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 //Search results
 
@@ -72,6 +73,8 @@ data class PrimaryData(
     val currency: String? = null
 )
 
+
+
 @Serializable
 data class Body(
     val symbol: String,
@@ -79,11 +82,12 @@ data class Body(
     val stockType: String,
     val exchange: String,
     val primaryData: PrimaryData,
-    val secondaryData: String? = null,
+    val secondaryData: JsonElement? = null,  // Use JsonElement for flexible data
     val marketStatus: String,
     val assetClass: String,
     val keyStats: KeyStats
 )
+
 
 @Serializable
 data class StockResponse(

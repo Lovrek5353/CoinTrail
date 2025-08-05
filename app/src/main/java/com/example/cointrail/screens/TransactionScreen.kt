@@ -50,7 +50,12 @@ fun TransactionScreen(
 
     // Load transaction when screen is opened
     LaunchedEffect(categoryID, transactionID) {
-        viewModel.loadTransaction(categoryID, transactionID)
+        if(categoryID=="0"){
+            viewModel.loadSingleTransaction(transactionID)
+        }
+        else{
+            viewModel.loadTransaction(categoryID, transactionID)
+        }
     }
 
     Scaffold(

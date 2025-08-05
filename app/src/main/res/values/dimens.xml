@@ -23,4 +23,5 @@
     <dimen name="padding48">48dp</dimen>
     <dimen name="round20">20dp</dimen>
     <dimen name="size36">36dp</dimen>
+    <dimen name="padding32">32dp</dimen>
 </resources>

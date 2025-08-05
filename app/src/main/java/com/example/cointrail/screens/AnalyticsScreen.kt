@@ -1,10 +1,14 @@
 package com.example.cointrail.screens
 
 import AnalyticsViewModel
+import CompareTwoMonthsTransactionsChart
+import CompareTwoMonthsTransactionsChartPreview
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -49,7 +53,11 @@ fun AnalyticsScreen(
     val sumByType by viewModel.sumByType.collectAsState()
     val sumByCategory by viewModel.sumByCategory.collectAsState()
     val monthlyIncomeExpense by viewModel.monthlyIncomeExpense.collectAsState()
+    val currentMonthTransactions by viewModel.currentMonthTransactionsWithName.collectAsState()
+    val previousMonthTransactions by viewModel.previousMonthTransactionsWithName.collectAsState()
 
+    Log.d("AnalyticsScreen",currentMonthTransactions.toString())
+    Log.d("AnalyticsScreen",previousMonthTransactions.toString())
     if (transactions == null ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -132,6 +140,17 @@ fun AnalyticsScreen(
             }
             item{
                 TransactionsByMonthGraph(monthlyIncomeExpense)
+            }
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    CompareTwoMonthsTransactionsChart(
+                        currentMonthTransactions = currentMonthTransactions,
+                        previousMonthTransactions = previousMonthTransactions,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
         }
     }

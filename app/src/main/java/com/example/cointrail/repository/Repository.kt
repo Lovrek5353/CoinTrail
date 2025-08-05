@@ -8,6 +8,8 @@ import com.example.cointrail.data.Stock
 import com.example.cointrail.data.Tab
 import com.example.cointrail.data.Transaction
 import com.example.cointrail.data.User
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
@@ -76,5 +78,8 @@ interface Repository {
     fun searchAssets(query: String): Flow<List<AssetSearch>>
     fun fetchAssetDetails(symbol: String, type: String="STOCKS"): Flow<Stock>
     fun fetchAssetHistory(symbol: String): Flow<List<AssetHistory>>
+    fun deleteData(userID: String?)
+
+    suspend fun signInWithGoogle(idToken: String): Result<User>
 
 }

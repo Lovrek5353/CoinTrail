@@ -6,9 +6,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.RequestQuote
+import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -75,9 +80,9 @@ fun MainScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Settings action */ }) {
+                    IconButton(onClick = { navController.navigate(Screen.AccountScreen.route) }) {
                         Icon(
-                            imageVector = Icons.Default.Settings,
+                            imageVector = Icons.Default.Person,
                             contentDescription = stringResource(id = R.string.settingsIcon),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
@@ -95,19 +100,19 @@ fun MainScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     IconButton(onClick = { navController.navigate(Screen.CategoriesScreen.route) }) {
-                        Icon(Icons.Filled.Menu, contentDescription = "Categories")
+                        Icon(Icons.Filled.Category, contentDescription = "Categories")
                     }
                     IconButton(onClick = { navController.navigate(Screen.SavingPocketsScreen.route) }) {
-                        Icon(Icons.Filled.Add, contentDescription = "Savings")
+                        Icon(Icons.Filled.Savings, contentDescription = "Savings")
                     }
                     IconButton(onClick = { navController.navigate(Screen.TabsScreen.route) }) {
-                        Icon(Icons.Default.Settings, contentDescription = "Tabs")
+                        Icon(Icons.Default.RequestQuote, contentDescription = "Tabs")
                     }
                     IconButton(onClick = { navController.navigate(Screen.AssetSearchScreen.route) }) {
-                        Icon(Icons.Default.PlayArrow, contentDescription = "Portfolio")
+                        Icon(Icons.Default.PieChart, contentDescription = "Portfolio")
                     }
                     IconButton(onClick = { navController.navigate(Screen.AnalyticsScreen.route) }) {
-                        Icon(Icons.Default.Person, contentDescription = "Profile")
+                        Icon(Icons.Default.Analytics, contentDescription = "Profile")
                     }
                 }
             }
@@ -169,15 +174,16 @@ fun MainScreen(
                 )
             }
             item {
-                TransactionsTable(transactions,
-                    onTransactionClick = { categoryId, transactionId ->
+                TransactionsTable(
+                    transactions = transactions,
+                    onTransactionClick = { categoryID, transactionID ->
+                        val categoryIDForNav = "0"
                         navController.navigate(
-                            Screen.TransactionScreen.createRoute(
-                                categoryId,
-                                transactionId
-                            )
+                            Screen.TransactionScreen.createRoute(categoryIDForNav, transactionID)
                         )
-                    })
+                    }
+                )
+
             }
             item {
                 Spacer(modifier = Modifier.height(24.dp))
@@ -226,13 +232,3 @@ fun MainScreen(
         }
     }
 }
-
-// -- STRINGS TO ADD TO res/values/strings.xml --
-/*
-<string name="welcomeBack">Welcome Back,</string>
-<string name="transactions">Transactions</string>
-<string name="spending_over_time">Spending Over Time</string>
-<string name="total_spending_by_category">Total Spending by Category</string>
-*/
-
-// -- PREVIEW FUNCTION OMITTED (AS BEFORE) --

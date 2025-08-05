@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.cointrail.screens.AnalyticsScreen
+import com.example.cointrail.screens.AccountScreen
 import com.example.cointrail.screens.AssetSearchScreen
 import com.example.cointrail.screens.CategoriesScreen
 import com.example.cointrail.screens.CategoryScreen
@@ -20,15 +21,19 @@ import com.example.cointrail.screens.CategoryTransactionEditorScreen
 import com.example.cointrail.screens.ForgotPasswordScreen
 import com.example.cointrail.screens.LoginScreen
 import com.example.cointrail.screens.MainScreen
+import com.example.cointrail.screens.PortfolioScreen
 import com.example.cointrail.screens.SavingPocketEditorScreen
 import com.example.cointrail.screens.SavingPocketScreen
 import com.example.cointrail.screens.SavingPocketTransactionEditor
 import com.example.cointrail.screens.SavingPocketsScreen
+import com.example.cointrail.screens.StocksScreen
 import com.example.cointrail.screens.TabEditorScreen
 import com.example.cointrail.screens.TabScreen
+import com.example.cointrail.screens.TabTransactionEditor
 import com.example.cointrail.screens.TabsScreen
 import com.example.cointrail.screens.TransactionEditorScreen
 import com.example.cointrail.screens.UpdateTransactionEditorScreen
+import com.example.cointrail.screens.WelcomeScreen
 
 import com.example.cointrail.viewModels.LoginViewModel
 import com.example.cointrail.viewModels.MainViewModel
@@ -56,7 +61,7 @@ fun Navigation(startRoute: String) {
         composable(route = Screen.LoginScreen.route) {
             LoginScreen(
                 navController = navController,
-                viewModel = koinViewModel<LoginViewModel>()
+               viewModel = koinViewModel<LoginViewModel>()
             )
         }
         composable(route = Screen.CategoriesScreen.route) {
@@ -174,7 +179,7 @@ fun Navigation(startRoute: String) {
         ){
             val encodedId = it.arguments?.getString("tabID") ?: ""
             val tabID = URLDecoder.decode(encodedId, "UTF-8")
-            com.example.cointrail.screens.TabTransactionEditor(
+            TabTransactionEditor(
                 viewModel = koinViewModel<TabsViewModel>(),
                 navController = navController,
                 tabID = tabID
@@ -211,7 +216,7 @@ fun Navigation(startRoute: String) {
             )
         }
         composable(route = Screen.StocksScreen.route) {
-            com.example.cointrail.screens.StocksScreen(
+            StocksScreen(
                 viewModel = koinViewModel<StocksViewModel>()
             )
         }
@@ -245,6 +250,26 @@ fun Navigation(startRoute: String) {
             AnalyticsScreen(
                 viewModel = koinViewModel<AnalyticsViewModel>(),
                 navController = navController
+            )
+        }
+        composable(route=Screen.AccountScreen.route) {
+            AccountScreen(
+                viewModel = koinViewModel<LoginViewModel>(),
+                navController=navController,
+                onNameEditClick = {
+                    navController.navigate(Screen.AccountEditorScreen.route) {
+                    }
+                }
+            )
+        }
+        composable(route=Screen.PortfolioScreen.route) {
+            PortfolioScreen(
+                navController = navController,
+            )
+        }
+        composable(route=Screen.WelcomeScreen.route) {
+            WelcomeScreen(
+                navController = navController,
             )
         }
     }

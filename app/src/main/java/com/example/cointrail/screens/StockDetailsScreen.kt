@@ -38,6 +38,7 @@ fun StockDetailsScreen(
     navController: NavController,
     viewModel: StocksViewModel
 ) {
+    Log.d("StockSymbolDetails", stockSymbol)
     var isFavorite by remember { mutableStateOf(false) }
 
     LaunchedEffect(stockSymbol) {
@@ -49,6 +50,7 @@ fun StockDetailsScreen(
     val stockHistory by viewModel.stockHistory.collectAsState()
 
     Log.d("StockHistory", stockHistory.toString())
+    Log.d("Stock",stock.toString())
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(

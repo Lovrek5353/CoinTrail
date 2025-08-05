@@ -25,13 +25,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.cointrail.R
+import com.example.cointrail.navigation.Screen
 import com.example.cointrail.ui.theme.CoinTrailTheme
 
 
 @Composable
 fun WelcomeScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController,
 ) {
     Column(
         modifier = modifier
@@ -71,7 +74,7 @@ fun WelcomeScreen(
 
         // Login Button
         Button(
-            onClick = { /* Handle login click */ },
+            onClick = { navController.navigate(Screen.LoginScreen.route)},
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -87,7 +90,7 @@ fun WelcomeScreen(
 
         // Get Started Button
         Button(
-            onClick = { /* Handle get started click */ },
+            onClick = { navController.navigate(Screen.SignUpScreen.route) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer
@@ -104,10 +107,10 @@ fun WelcomeScreen(
 
 
 
-@Preview
-@Composable
-fun WelcomeScreenPreview(){
-    CoinTrailTheme {
-        WelcomeScreen()
-    }
-}
+//@Preview
+//@Composable
+//fun WelcomeScreenPreview(){
+//    CoinTrailTheme {
+//        WelcomeScreen()
+//    }
+//}
