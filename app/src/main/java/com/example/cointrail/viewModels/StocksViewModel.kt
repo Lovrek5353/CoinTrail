@@ -1,5 +1,9 @@
 package com.example.cointrail.viewModels
 
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.EmptyPath
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,7 +11,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cointrail.data.AssetHistory
 import com.example.cointrail.data.AssetSearch
 import com.example.cointrail.data.Stock
+import com.example.cointrail.data.Tab
 import com.example.cointrail.repository.Repository
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -22,6 +28,24 @@ class StocksViewModel(
     private val _assetDetails=MutableStateFlow<Stock>(Stock())
     val assetDetails: StateFlow<Stock> = _assetDetails
 
+    // UI event flow for Snackbar/navigation
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
+    var amountString by mutableStateOf("")
+        private set
+
+    private val _stocks = MutableStateFlow<List<Stock>>(emptyList())
+    val stocks: StateFlow<List<Stock>> = _stocks
+
+    init {
+        // Collect from stocksSharedFlow from repository
+        viewModelScope.launch {
+            repository.stocksSharedFlow.collect { stockList ->
+                _stocks.value = stockList
+            }
+        }
+    }
     // Expose search results as StateFlow, debounced and reactive
     @OptIn(ExperimentalCoroutinesApi::class)
     val searchResults: StateFlow<List<AssetSearch>> = _searchQuery
@@ -36,6 +60,10 @@ class StocksViewModel(
 
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
+    }
+
+    fun onAmountInput(newAmount: String) {
+        amountString = newAmount
     }
 
 
@@ -59,5 +87,72 @@ class StocksViewModel(
                 _stockHistory.value = history
             }
             .launchIn(viewModelScope)
+    }
+
+    fun onStockAdd(){
+        viewModelScope.launch{
+            try{
+                val currentUser = repository.currentUser.value
+                val userId = currentUser?.id ?: run {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("User not logged in"))
+                    return@launch
+                }
+
+                //Validation
+                if (amountString.isBlank()) {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Amount cannot be empty"))
+                    return@launch
+                }
+                val amountValue = amountString.toDoubleOrNull()
+                if (amountValue == null || amountValue <= 0) {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Invalid amount"))
+                    return@launch
+                }
+                //Create stock record to store in database
+                val stockToSave=Stock(
+                    name= stockState.value!!.name,
+                    symbol = stockState.value!!.symbol,
+                    originalPrice = stockState.value!!.currentPrice,
+                    currentPrice = stockState.value!!.currentPrice,
+                    amount=amountValue,
+                    currentStockPrice = stockState.value!!.currentPrice*amountValue,
+                    currency = stockState.value!!.currency,
+                    netChange = stockState.value!!.netChange,
+                    deltaIndicator = stockState.value!!.deltaIndicator,
+                    exchange = stockState.value!!.exchange,
+                    purchaseDate = Timestamp.now(),
+                    userID=userId
+                )
+                repository.addStockToDB(stockToSave)
+                Log.d("StocksViewModel", "Stock saved: $stockToSave")
+                _eventFlow.emit(UiEvent.SubmissionSuccess)
+            }
+            catch (e: Exception) {
+                _eventFlow.emit(UiEvent.ShowSnackbar(e.message ?: "Unknown error"))
+            }
+        }
+    }
+    private val _currentStock = MutableStateFlow<Stock?>(null)
+    val currentStock: StateFlow<Stock?> = _currentStock
+
+    // Call this function with the stock ID you want to observe
+    fun loadStock(stockID: String) {
+        viewModelScope.launch {
+            repository.getStock(stockID).collect { stock ->
+                _currentStock.value = stock
+            }
+        }
+    }
+//    fun fetchTab(tabId: String) {
+//        viewModelScope.launch {
+//            repository.getTab(tabId)
+//                .collect { tab ->
+//                    _tab.value = tab
+//                }
+//        }
+//    }
+    sealed class UiEvent {
+        data class ShowSnackbar(val message: String) : UiEvent()
+        object SubmissionSuccess : UiEvent()
     }
 }

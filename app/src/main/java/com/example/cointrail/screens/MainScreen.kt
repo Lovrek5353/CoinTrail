@@ -108,7 +108,7 @@ fun MainScreen(
                     IconButton(onClick = { navController.navigate(Screen.TabsScreen.route) }) {
                         Icon(Icons.Default.RequestQuote, contentDescription = "Tabs")
                     }
-                    IconButton(onClick = { navController.navigate(Screen.AssetSearchScreen.route) }) {
+                    IconButton(onClick = { navController.navigate(Screen.StocksScreen.route) }) {
                         Icon(Icons.Default.PieChart, contentDescription = "Portfolio")
                     }
                     IconButton(onClick = { navController.navigate(Screen.AnalyticsScreen.route) }) {

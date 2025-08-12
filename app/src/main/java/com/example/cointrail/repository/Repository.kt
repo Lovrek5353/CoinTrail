@@ -22,6 +22,7 @@ interface Repository {
     val categoriesSharedFlow: SharedFlow<List<Category>>
     val tabsGeneralFlow: SharedFlow<List<Tab>>
     val savingPocketsGeneralFlow: SharedFlow<List<SavingPocket>>
+    val stocksSharedFlow: SharedFlow<List<Stock>>
 
     fun getAllTransactionsByUser(): SharedFlow<List<Transaction>>
     fun getTransactions(): SharedFlow<List<Transaction>>
@@ -78,6 +79,12 @@ interface Repository {
     fun searchAssets(query: String): Flow<List<AssetSearch>>
     fun fetchAssetDetails(symbol: String, type: String="STOCKS"): Flow<Stock>
     fun fetchAssetHistory(symbol: String): Flow<List<AssetHistory>>
+    suspend fun addStockToDB(stock: Stock)
+    fun getStocks(): Flow<List<Stock>>
+    fun getStock(stockID: String): Flow<Stock>
+
+
+
     fun deleteData(userID: String?)
 
     suspend fun signInWithGoogle(idToken: String): Result<User>

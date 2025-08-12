@@ -21,6 +21,7 @@ data class Stock(
     val targetPrice: Double? = null,
     val deltaIndicator: String = "",
     val netChange: String = "",
+    val userID: String=""
 )
 
 data class StockDetailsResponse(
@@ -43,7 +44,7 @@ fun Body.toStock()=Stock(
     symbol = symbol,
     name = companyName,
     exchange = exchange,
-    currentStockPrice = primaryData.lastSalePrice
+    currentPrice = primaryData.lastSalePrice
         .replace("$", "")
         .replace(",", "")
         .trim()

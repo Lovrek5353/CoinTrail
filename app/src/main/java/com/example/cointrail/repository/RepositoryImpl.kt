@@ -65,7 +65,7 @@ internal class RepositoryImpl(private val stockApi: StockAPI)
     private val transactionsReference=db.collection("transactions")
     private val savingPocketsReference=db.collection("savingPockets")
     private val tabsReference=db.collection("tabs")
-
+    private val stocksReference=db.collection("stocks")
 
     // Singleton SharedFlow for all collectors
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -873,6 +873,91 @@ internal class RepositoryImpl(private val stockApi: StockAPI)
             emit(emptyList())
         }
     }
+
+    override suspend fun addStockToDB(stock: Stock) {
+        Log.d("RepositoryImpl", "Adding stock: $stock")
+        try{
+            val data= hashMapOf(
+                "name" to stock.name,
+                "symbol" to stock.symbol,
+                "originalPrice" to stock.originalPrice,
+                "currentPrice" to stock.currentPrice,
+                "amount" to stock.amount,
+                "purchaseDate" to stock.purchaseDate,
+                "currentStockPrice" to stock.currentStockPrice,
+                "currency" to stock.currency,
+                "netChange" to stock.netChange,
+                "deltaIndicator" to stock.deltaIndicator,
+                "exchange" to stock.exchange,
+                "dividendsReceived" to stock.dividendsReceived,
+                "userID" to stock.userID
+            )
+            stocksReference.add(data).await()
+        }
+        catch (e: Exception){
+            throw e
+       }
+    }
+
+    override fun getStocks(): Flow<List<Stock>> {
+        TODO("Not yet implemented")
+    }
+
+
+    private val stocksFlows= mutableMapOf<String, SharedFlow<Stock>>()
+    override fun getStock(stockID: String): Flow<Stock> {
+        return stocksFlows.getOrPut(stockID){
+            callbackFlow {
+                val docRef = stocksReference.document(stockID)
+                val registration=docRef.addSnapshotListener{ snapshot, error ->
+                    if(error!=null){
+                        close(error)
+                        return@addSnapshotListener
+                    }
+                    val stock=snapshot?.toObject(Stock::class.java)?.copy(id=snapshot.id)
+                    if (stock != null) {
+                        trySend(stock)
+                    }
+                }
+                awaitClose { registration.remove() }
+            } .shareIn(
+                scope = repositoryScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                replay = 1
+            )
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override val stocksSharedFlow: SharedFlow<List<Stock>> =
+        currentUser
+            .flatMapLatest {
+                if (it?.id == null) {
+                    flowOf(emptyList()) // don't load anything if user is not available
+                } else {
+                    callbackFlow<List<Stock>> {
+                        val query = stocksReference
+                            .whereEqualTo("userID", it.id)
+                        val registration = query.addSnapshotListener { value, error ->
+                            if (error != null) {
+                                close(error)
+                                return@addSnapshotListener
+                            }
+                            val stocks = value?.documents?.mapNotNull { doc ->
+                                doc.toObject(Stock::class.java)?.copy(id = doc.id)
+                            } ?: emptyList()
+                            trySend(stocks).isSuccess
+                        }
+                        awaitClose { registration.remove() }
+                    }
+                }
+                }
+            .shareIn(
+                scope = repositoryScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                replay = 1
+            )
+
     override suspend fun signInWithGoogle(idToken: String): Result<User> {
         Log.d("signInWithGoogle", "Start sign-in with Google, idToken length: ${idToken.length}")
         return try {
@@ -931,6 +1016,4 @@ internal class RepositoryImpl(private val stockApi: StockAPI)
             Result.failure(e)
         }
     }
-
-
 }

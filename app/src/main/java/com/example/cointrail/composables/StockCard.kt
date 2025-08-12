@@ -68,7 +68,7 @@ fun StockCard(
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = String.format("%+.2f%%", percentChange),
+                    text = "${stock.netChange}%",
                     color = percentColor,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold

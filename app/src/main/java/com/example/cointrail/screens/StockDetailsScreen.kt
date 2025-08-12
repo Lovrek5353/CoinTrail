@@ -36,18 +36,21 @@ import com.google.firebase.Timestamp
 fun StockDetailsScreen(
     stockSymbol: String,
     navController: NavController,
-    viewModel: StocksViewModel
+    viewModel: StocksViewModel,
+    stockID: String
 ) {
     Log.d("StockSymbolDetails", stockSymbol)
     var isFavorite by remember { mutableStateOf(false) }
 
-    LaunchedEffect(stockSymbol) {
+    LaunchedEffect(stockSymbol, stockID) {
         viewModel.fetchStockDetails(stockSymbol, type = "STOCKS")
         viewModel.fetchStockHistory(stockSymbol)
+        viewModel.loadStock(stockID)
     }
 
     val stock by viewModel.stockState.collectAsState()
     val stockHistory by viewModel.stockHistory.collectAsState()
+    val stockDB = viewModel.currentStock.collectAsState()
 
     Log.d("StockHistory", stockHistory.toString())
     Log.d("Stock",stock.toString())

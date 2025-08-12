@@ -66,4 +66,9 @@ sealed class Screen (val route: String) {
     data object PortfolioScreen: Screen("portfolio")
 
     data object NotificationScreen: Screen("notification_screen")
+
+    data object StockEditorScreen: Screen("stock_editor_screen/{stockSymbol}") {
+        fun createRoute(stockSymbol: String) =
+            "stock_editor_screen/${URLEncoder.encode(stockSymbol, "UTF-8")}"
+    }
 }

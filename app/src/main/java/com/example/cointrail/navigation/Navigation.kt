@@ -30,6 +30,7 @@ import com.example.cointrail.screens.SavingPocketEditorScreen
 import com.example.cointrail.screens.SavingPocketScreen
 import com.example.cointrail.screens.SavingPocketTransactionEditor
 import com.example.cointrail.screens.SavingPocketsScreen
+import com.example.cointrail.screens.StockEditorScreen
 import com.example.cointrail.screens.StocksScreen
 import com.example.cointrail.screens.TabEditorScreen
 import com.example.cointrail.screens.TabScreen
@@ -220,7 +221,8 @@ fun Navigation(startRoute: String) {
         }
         composable(route = Screen.StocksScreen.route) {
             StocksScreen(
-                viewModel = koinViewModel<StocksViewModel>()
+                viewModel = koinViewModel<StocksViewModel>(),
+                navController = navController
             )
         }
         composable(route=Screen.UpdateTransactionEditorScreen.route,
@@ -268,6 +270,7 @@ fun Navigation(startRoute: String) {
         composable(route=Screen.PortfolioScreen.route) {
             PortfolioScreen(
                 navController = navController,
+                viewModel = koinViewModel<StocksViewModel>()
             )
         }
         composable(route=Screen.WelcomeScreen.route) {
@@ -277,6 +280,16 @@ fun Navigation(startRoute: String) {
         }
         composable(route=Screen.NotificationScreen.route) {
             NotificationScreen(viewModel = koinViewModel<NotificationViewModel>())
+        }
+        composable(route=Screen.StockEditorScreen.route,
+            arguments = listOf(navArgument("stockSymbol") { type = NavType.StringType })){
+            val encodedId = it.arguments?.getString("stockSymbol") ?: ""
+            val stockSymbol = URLDecoder.decode(encodedId, "UTF-8")
+            StockEditorScreen(
+                viewModel = koinViewModel<StocksViewModel>(),
+                navController = navController,
+                stockSymbol = stockSymbol
+            )
         }
     }
 }
