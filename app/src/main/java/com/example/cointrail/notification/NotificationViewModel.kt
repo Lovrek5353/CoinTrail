@@ -29,6 +29,25 @@ class NotificationViewModel(
             initialValue = Pair(9, 0) // Default time
         )
 
+    // StateFlow to expose light theme enabled state to UI
+    val isLightTheme: StateFlow<Boolean> = preferencesRepository.isLightThemeFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+    /**
+     * Sets the light theme preference.
+     *
+     * @param isLight True for light mode, false for dark mode.
+     */
+    fun setLightTheme(isLight: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setLightTheme(isLight)
+        }
+    }
+
     /**
      * Toggles the notification on/off and schedules/cancels the alarm accordingly.
      *

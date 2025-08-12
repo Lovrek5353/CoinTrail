@@ -36,7 +36,7 @@ fun TransactionScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    // Collect snackbar events from the ViewModel
+    // Collect snack-bar events from the ViewModel
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {

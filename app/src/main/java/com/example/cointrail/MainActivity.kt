@@ -7,22 +7,29 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.cointrail.navigation.Navigation
 import com.example.cointrail.navigation.Screen
+import com.example.cointrail.notification.NotificationPreferencesRepository
 import com.example.cointrail.notification.NotificationUtils
 import com.example.cointrail.notification.NotificationViewModel
 import com.example.cointrail.ui.theme.CoinTrailTheme
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
@@ -30,60 +37,61 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge() // Preserved from your original MainActivity
+        enableEdgeToEdge()
 
-        // 1. Create Notification Channel
+        // Get the NotificationPreferencesRepository instance using Koin
+        val preferencesRepository: NotificationPreferencesRepository by inject()
+
+        // Launch a coroutine to update the last app open timestamp
+        lifecycleScope.launch {
+            preferencesRepository.setLastAppOpenTimestamp(System.currentTimeMillis())
+            Log.d("MainActivity", "Last app open timestamp updated.")
+        }
+
+        // Create Notification Channel (this is fine here)
         NotificationUtils.createNotificationChannel(applicationContext)
 
-        // 2. Request POST_NOTIFICATIONS permission for Android 13+
-        // This launcher handles the permission request result
-        val requestPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                Log.d("MainActivity", "POST_NOTIFICATIONS permission granted.")
-                // If permission is granted, and notifications were previously enabled, re-schedule
-                // This will be handled by the ViewModel's toggleNotification if the switch is on.
-            } else {
-                Log.w("MainActivity", "POST_NOTIFICATIONS permission denied.")
-                // Explain to the user why the permission is needed
-            }
-        }
-
-        // Check and request permission on app start
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        }
-
         setContent {
-            // Koin will inject the ViewModel for you.
-            // This declaration must be inside a @Composable function.
+            var isDarkTheme by remember { mutableStateOf(false) }
+
+            // All @Composable functions must be called within this setContent block
+            // or another @Composable function.
+
+            // 1. Define the permission launcher inside a Composable context
+            val requestPermissionLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted: Boolean ->
+                if (isGranted) {
+                    Log.d("MainActivity", "POST_NOTIFICATIONS permission granted.")
+                    // Handle permission grant
+                } else {
+                    Log.w("MainActivity", "POST_NOTIFICATIONS permission denied.")
+                    // Explain to the user why the permission is needed
+                }
+            }
+
+            // 2. Request permission when the Composable is first launched
+            val context = LocalContext.current
+            LaunchedEffect(Unit) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+            }
+
+            // Koin ViewModel injection is also a Composable call
             val notificationViewModel: NotificationViewModel = koinViewModel()
 
-            CoinTrailTheme { // Using your existing theme
-                Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues -> // Added paddingValues parameter
+            CoinTrailTheme {
+                Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
                     // Your existing navigation structure
+                    // The paddingValues should ideally be used, e.g., Modifier.padding(paddingValues)
                     Navigation(startRoute = Screen.WelcomeScreen.route)
-
-                    // You can choose to overlay the NotificationScreen or navigate to it.
-                    // For demonstration, here's how you could include it:
-                    // If you want to navigate to it, you'd add it as a destination in your Navigation Composable
-                    // For now, let's place it in a Box to show it on top for testing,
-                    // or you can integrate it into your existing navigation flow.
-                    // For example, you might have a settings screen that includes NotificationScreen.
-                    // Box(
-                    //     modifier = Modifier
-                    //         .fillMaxSize()
-                    //         .padding(paddingValues) // Apply padding from Scaffold
-                    // ) {
-                    //     NotificationScreen(viewModel = notificationViewModel)
-                    // }
                 }
             }
         }

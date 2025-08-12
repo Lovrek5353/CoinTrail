@@ -53,6 +53,8 @@
 
         val category= viewModel.singleCategory.collectAsState()
         val transactionList= viewModel.transactions.collectAsState()
+
+        Log.d("Category Screen transactionList: ", transactionList.value.toString())
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(

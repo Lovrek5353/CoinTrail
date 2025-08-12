@@ -12,18 +12,13 @@ import com.example.cointrail.data.User
 import com.example.cointrail.data.toAssetHistory
 import com.example.cointrail.data.toAssetSearch
 import com.example.cointrail.data.toStock
-import com.example.cointrail.network.KtorClient
 import com.example.cointrail.network.StockAPI
-import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.ktx.toObject
-import io.ktor.client.request.get
-import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -42,12 +37,8 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
-import io.ktor.client.request.header
-import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
@@ -77,6 +68,7 @@ internal class RepositoryImpl(private val stockApi: StockAPI)
 
 
     // Singleton SharedFlow for all collectors
+    @OptIn(ExperimentalCoroutinesApi::class)
     override val transactionSharedFlow: SharedFlow<List<Transaction>> =
         currentUser
             .flatMapLatest { user ->
@@ -84,10 +76,8 @@ internal class RepositoryImpl(private val stockApi: StockAPI)
                     flowOf(emptyList()) // don't load anything if user is not available
                 } else {
                     val calendar = Calendar.getInstance()
-                    calendar.add(Calendar.DAY_OF_YEAR, -60)
+                    calendar.add(Calendar.DAY_OF_YEAR, -120)
                     val date = Timestamp(calendar.time)
-
-                    Log.d("Repo", "Firestore query for userID=${user.id}, date >= $date")
 
                     callbackFlow<List<Transaction>> {
                         val query = transactionsReference

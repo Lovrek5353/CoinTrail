@@ -31,14 +31,13 @@ val apiModule = module {
 
 val notificationModule = module {
 
-    // Provide NotificationPreferencesRepository (assuming you provide DataStore elsewhere)
     single { NotificationPreferencesRepository(get()) }
 
-    // Provide NotificationScheduler
     single { NotificationScheduler() }
 
-    // Provide NotificationViewModel with injected dependencies
-    viewModel { NotificationViewModel(preferencesRepository = get(), notificationScheduler = get()) }
+    viewModel { NotificationViewModel(
+        preferencesRepository = get(), notificationScheduler = get(),
+    ) }
 }
 
 val repositoryModule= module{

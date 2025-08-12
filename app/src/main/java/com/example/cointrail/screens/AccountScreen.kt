@@ -30,15 +30,13 @@ fun AccountScreen(
     val user = viewModel.localUser.collectAsState().value
 
     if (user == null) {
-        // User is null: Show a placeholder UI or logged-out state
-        // Optionally you can navigate away, or just show message
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Text(text = stringResource(id = R.string.no_user_found))
         }
-        return // Early return prevents any further rendering with a null user
+        return 
     }
 
     Scaffold(

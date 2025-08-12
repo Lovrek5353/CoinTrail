@@ -45,6 +45,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
+
 // --- 1. Constants ---
 object Constants {
     const val NOTIFICATION_ID = 1001
@@ -54,6 +55,11 @@ object Constants {
     const val NOTIFICATION_TIME_HOUR_KEY = "notification_time_hour"
     const val NOTIFICATION_TIME_MINUTE_KEY = "notification_time_minute"
     const val NOTIFICATION_ENABLED_KEY = "notification_enabled"
+    const val LAST_APP_OPEN_TIMESTAMP_KEY = "last_app_open_timestamp" // New constant
+
+    // New constants for notification action
+    const val NOTIFICATION_ACTION_NO_ACTION_NEEDED = "com.example.cointrail.NO_ACTION_NEEDED"
+    const val NOTIFICATION_ACTION_REQUEST_CODE = 2002 // Unique request code for the action pending intent
 }
 
 // --- 2. Notification Utilities ---
@@ -80,27 +86,44 @@ object NotificationUtils {
     /**
      * Builds and displays the notification.
      * When the user taps this notification, it will open the MainActivity.
+     * It also includes an action button for "No action needed".
      */
     fun showNotification(context: Context) {
-        // Create an Intent for the activity to open when the notification is tapped
-        val intent = Intent(context, MainActivity::class.java).apply {
+        // Intent to open the MainActivity when the notification body is tapped
+        val contentIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(
+        val contentPendingIntent: PendingIntent = PendingIntent.getActivity(
             context,
             Constants.NOTIFICATION_REQUEST_CODE,
-            intent,
+            contentIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        // Intent for the "No action needed" button
+        val noActionNeededIntent = Intent(context, NotificationActionReceiver::class.java).apply {
+            action = Constants.NOTIFICATION_ACTION_NO_ACTION_NEEDED
+        }
+        val noActionNeededPendingIntent: PendingIntent = PendingIntent.getBroadcast(
+            context,
+            Constants.NOTIFICATION_ACTION_REQUEST_CODE, // Use a unique request code for this action
+            noActionNeededIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         // Build the notification
         val builder = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm) // Use a built-in icon or your own
-            .setContentTitle("Daily Reminder to track your finances")
-            .setContentText("It's time for your daily check-in!")
+            .setContentTitle("Daily Reminder")
+            .setContentText("It's time for your daily check-in! Tap to open or acknowledge.")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(pendingIntent) // Set the intent to open the app
-            .setAutoCancel(true) // Automatically removes the notification when the user taps it
+            .setContentIntent(contentPendingIntent) // Set the intent to open the app on body tap
+            .setAutoCancel(true) // Automatically removes the notification when the user taps it or swipes it away
+            .addAction( // Add the "No action needed" button
+                0, // Icon (can be 0 if not needed, or a drawable resource)
+                "No action needed", // Text for the button
+                noActionNeededPendingIntent // The PendingIntent to send when this button is tapped
+            )
 
         // Show the notification
         with(NotificationManagerCompat.from(context)) {

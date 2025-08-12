@@ -40,7 +40,7 @@ fun CompareTwoMonthsTransactionsChart(
     val density = LocalDensity.current
     val barHeight = 26.dp
     val barMinWidth = 5.dp
-    val labelMinInsideWidth = 38.dp // Always show number outside if bar shorter than this
+    val labelMinInsideWidth = 38.dp
 
     val barAreaPx = with(density) { (screenWidthDp * chartWidthFraction).toPx() }
     val halfBarAreaPx = barAreaPx / 2
@@ -52,14 +52,14 @@ fun CompareTwoMonthsTransactionsChart(
     val chartData = allCategories.map { catId ->
         Triple(
             categoryIdToName(catId),
-            currSums[catId] ?: 0.0,   // current month on left
-            prevSums[catId] ?: 0.0    // previous month on right
+            currSums[catId] ?: 0.0,
+            prevSums[catId] ?: 0.0
         )
     }.sortedByDescending { it.second + it.third }
 
     val barColors = listOf(
-        MaterialTheme.colorScheme.secondaryContainer,  // current month (left)
-        MaterialTheme.colorScheme.primaryContainer     // previous month (right)
+        MaterialTheme.colorScheme.secondaryContainer,
+        MaterialTheme.colorScheme.primaryContainer
     )
     val barTextColors = listOf(
         MaterialTheme.colorScheme.onSecondaryContainer,
