@@ -1,9 +1,9 @@
+package com.example.cointrail.screens
+
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
@@ -16,20 +16,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.cointrail.R
 import com.example.cointrail.composables.HistoryLineGraph
-import com.example.cointrail.composables.HistoryLineGraphPreview
 import com.example.cointrail.data.Stock
 import com.example.cointrail.viewModels.StocksViewModel
-import com.google.firebase.Timestamp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,24 +34,25 @@ fun StockDetailsScreen(
     Log.d("StockSymbolDetails", stockSymbol)
     var isFavorite by remember { mutableStateOf(false) }
 
+    // Load API and history always, DB only if ID is provided
     LaunchedEffect(stockSymbol, stockID) {
         viewModel.fetchStockDetails(stockSymbol, type = "STOCKS")
         viewModel.fetchStockHistory(stockSymbol)
-        viewModel.loadStock(stockID)
+        if (stockID.isNotBlank()) {
+            viewModel.loadStock(stockID)
+        }
     }
 
-    val stock by viewModel.stockState.collectAsState()
+    val stockApi by viewModel.stockState.collectAsState()
     val stockHistory by viewModel.stockHistory.collectAsState()
-    val stockDB = viewModel.currentStock.collectAsState()
+    val stockDB by viewModel.currentStock.collectAsState()
 
-    Log.d("StockHistory", stockHistory.toString())
-    Log.d("Stock",stock.toString())
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stock?.name ?: "Loading...",
+                        text = stockApi?.name ?: "Loading...",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimary
@@ -82,7 +75,7 @@ fun StockDetailsScreen(
                             tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                    IconButton(onClick = { /* TODO: Edit functionality */ }) {
+                    IconButton(onClick = { /* TODO: Edit */ }) {
                         Icon(
                             imageVector = Icons.Filled.Edit,
                             contentDescription = "Edit",
@@ -105,8 +98,8 @@ fun StockDetailsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                if (stock != null) {
-                    ModernStockDetailsBody(stock = stock!!)
+                if (stockApi != null) {
+                    ModernStockDetailsBody(stockApi = stockApi!!, stockDB = stockDB)
                 } else {
                     Box(
                         modifier = Modifier
@@ -126,13 +119,12 @@ fun StockDetailsScreen(
 }
 
 @Composable
-fun ModernStockDetailsBody(stock: Stock) {
+fun ModernStockDetailsBody(stockApi: Stock, stockDB: Stock?) {
     Column(
-        modifier = Modifier
-            .padding(20.dp),
+        modifier = Modifier.padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
-    ){
-        // --- Key Financial Overview ---
+    ) {
+        // --- API Main Overview ---
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.large,
@@ -145,29 +137,35 @@ fun ModernStockDetailsBody(stock: Stock) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text(
-                            text = stock.symbol,
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Black,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = stock.name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        if (!stockApi.symbol.isNullOrBlank()) {
+                            Text(
+                                text = stockApi.symbol,
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        if (!stockApi.name.isNullOrBlank()) {
+                            Text(
+                                text = stockApi.name,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
                     Column(horizontalAlignment = Alignment.End) {
-                        Text(
-                            text = "Current",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                        Text(
-                            text = "${stock.currentPrice} ${stock.currency}",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
+                        if (stockApi.currentPrice != 0.0) {
+                            Text(
+                                text = "Current",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                            Text(
+                                text = "${stockApi.currentPrice} ${stockApi.currency}",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
                 Divider()
@@ -176,76 +174,76 @@ fun ModernStockDetailsBody(stock: Stock) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
-                        Text(
-                            text = "Total Value",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                        Text(
-                            text = "${stock.currentStockPrice} ${stock.currency}",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                    // Total value from DB only if available
+                    if (stockDB?.currentStockPrice != null && stockDB.currentStockPrice != 0.0) {
+                        Column {
+                            Text(
+                                text = "Total Value",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                            Text(
+                                text = "${stockDB.currentStockPrice} ${stockApi.currency}",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
                     }
-                    // Net Change
-                    val netChange = stock.netChange.toDoubleOrNull() ?: 0.0
-                    val isPositive = netChange >= 0
-                    val deltaColor = if (isPositive) Color(0xFF4CAF50) else Color(0xFFF44336)
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = if (isPositive) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                            contentDescription = null,
-                            tint = deltaColor
-                        )
-                        Text(
-                            text = (if (isPositive) "+" else "") + "%.2f".format(netChange) + " ${stock.currency}",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = deltaColor
+                    // Net change from API
+                    val netChange = stockApi.netChange.toDoubleOrNull() ?: 0.0
+                    if (netChange != 0.0) {
+                        val isPositive = netChange >= 0
+                        val deltaColor = if (isPositive) Color(0xFF4CAF50) else Color(0xFFF44336)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = if (isPositive) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                contentDescription = null,
+                                tint = deltaColor
+                            )
+                            Text(
+                                text = (if (isPositive) "+" else "") + "%.2f".format(netChange) + "%",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = deltaColor
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // --- Investment Details (DB only) ---
+        if (stockDB != null) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    if (stockDB.amount != 0.0) InfoRow("Shares Owned", "%.2f".format(stockDB.amount))
+                    if (stockDB.originalPrice != 0.0) InfoRow("Bought At", "${stockDB.originalPrice} ${stockApi.currency}")
+                    stockDB.purchaseDate?.let { InfoRow("Purchase Date", it.toDate().toString()) }
+                    if (stockDB.targetPrice != null && stockDB.targetPrice != 0.0)
+                        InfoRow("Target Price", "${stockDB.targetPrice} ${stockApi.currency}")
+                    if (stockDB.dividendsReceived != 0.0)
+                        InfoRow("Dividends", "${stockDB.dividendsReceived} ${stockApi.currency}")
+                    if (!stockDB.sector.isNullOrBlank()) InfoRow("Sector", stockDB.sector)
+                    if (!stockDB.exchange.isNullOrBlank()) InfoRow("Exchange", stockDB.exchange)
+
+                    if (!stockApi.deltaIndicator.isNullOrBlank()) {
+                        val isUp = stockApi.deltaIndicator.lowercase() == "up"
+                        InfoRow(
+                            label = "Change",
+                            value = stockApi.deltaIndicator.replaceFirstChar { it.uppercase() },
+                            valueColor = if (isUp) Color(0xFF4CAF50) else Color(0xFFF44336)
                         )
                     }
                 }
             }
         }
 
-        // --- Investment Details ---
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-        ) {
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                InfoRow(label = "Shares Owned", value = "%.2f".format(stock.amount))
-                InfoRow(label = "Bought At", value = "${stock.originalPrice} ${stock.currency}")
-                stock.purchaseDate?.let {
-                    InfoRow(label = "Purchase Date", value = it.toDate().toString())
-                }
-                stock.targetPrice?.let {
-                    InfoRow(label = "Target Price", value = "$it ${stock.currency}")
-                }
-                if (stock.dividendsReceived > 0.0) {
-                    InfoRow(label = "Dividends", value = "${stock.dividendsReceived} ${stock.currency}")
-                }
-                if (stock.sector.isNotBlank()) {
-                    InfoRow(label = "Sector", value = stock.sector)
-                }
-                if (stock.exchange.isNotBlank()) {
-                    InfoRow(label = "Exchange", value = stock.exchange)
-                }
-                if (stock.deltaIndicator.isNotBlank()) {
-                    val isUp = stock.deltaIndicator.lowercase() == "up"
-                    InfoRow(
-                        label = "Change",
-                        value = stock.deltaIndicator.replaceFirstChar { it.uppercase() },
-                        valueColor = if (isUp) Color(0xFF4CAF50) else Color(0xFFF44336)
-                    )
-                }
-            }
-        }
-
-        // --- Notes Section ---
-        if (stock.notes.isNotBlank()) {
+        // --- Notes from DB ---
+        if (stockDB?.notes?.isNotBlank() == true) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
@@ -259,7 +257,7 @@ fun ModernStockDetailsBody(stock: Stock) {
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = stock.notes,
+                        text = stockDB.notes,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }

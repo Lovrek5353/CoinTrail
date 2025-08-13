@@ -23,6 +23,7 @@ import androidx.navigation.NavController
 import com.example.cointrail.R
 import com.example.cointrail.composables.StockCard
 import com.example.cointrail.data.Stock
+import com.example.cointrail.navigation.Screen
 import com.example.cointrail.viewModels.StocksViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,7 +77,7 @@ fun PortfolioScreen(
                 .padding(8.dp)
         ) {
             items(stocks.value) { stock ->
-                StockCard(stock = stock, onClick = {})
+                StockCard(stock = stock, onClick = {navController.navigate(Screen.StockDetailsScreen.createRoute(stockSymbol = stock.symbol, stockID = stock.id.toString()))})
             }
         }
     }

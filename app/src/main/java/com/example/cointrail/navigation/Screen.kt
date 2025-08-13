@@ -56,9 +56,9 @@ sealed class Screen (val route: String) {
     }
     data object AssetSearchScreen: Screen("asset_search_screen")
 
-    data object StockDetailsScreen: Screen("stock_details_screen/{stockSymbol}") {
-        fun createRoute(stockSymbol: String) =
-            "stock_details_screen/${URLEncoder.encode(stockSymbol, "UTF-8")}"
+    data object StockDetailsScreen: Screen("stock_details_screen/{stockSymbol}/{stockID}") {
+        fun createRoute(stockSymbol: String, stockID: String) =
+            "stock_details_screen/${URLEncoder.encode(stockSymbol, "UTF-8")}/${URLEncoder.encode(stockID, "UTF-8")}"
     }
     data object AnalyticsScreen: Screen("analytics_screen")
     data object AccountEditorScreen: Screen("account_editor_screen")

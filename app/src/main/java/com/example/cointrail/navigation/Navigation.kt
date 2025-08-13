@@ -5,7 +5,6 @@ import CategoriesViewModel
 import CategoryEditorScreen
 import NotificationScreen
 import SignUpScreen
-import StockDetailsScreen
 import TransactionScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +29,7 @@ import com.example.cointrail.screens.SavingPocketEditorScreen
 import com.example.cointrail.screens.SavingPocketScreen
 import com.example.cointrail.screens.SavingPocketTransactionEditor
 import com.example.cointrail.screens.SavingPocketsScreen
+import com.example.cointrail.screens.StockDetailsScreen
 import com.example.cointrail.screens.StockEditorScreen
 import com.example.cointrail.screens.StocksScreen
 import com.example.cointrail.screens.TabEditorScreen
@@ -241,16 +241,7 @@ fun Navigation(startRoute: String) {
                 navController = navController
             )
         }
-        composable(route= Screen.StockDetailsScreen.route,
-            arguments = listOf(navArgument("stockSymbol") { type = NavType.StringType })) {
-            val encodedId = it.arguments?.getString("stockSymbol") ?: ""
-            val stockSymbol = URLDecoder.decode(encodedId, "UTF-8")
-            StockDetailsScreen(
-                stockSymbol = stockSymbol,
-                viewModel = koinViewModel<StocksViewModel>(),
-                navController = navController
-            )
-        }
+
         composable(route=Screen.AnalyticsScreen.route) {
             AnalyticsScreen(
                 viewModel = koinViewModel<AnalyticsViewModel>(),
@@ -289,6 +280,27 @@ fun Navigation(startRoute: String) {
                 viewModel = koinViewModel<StocksViewModel>(),
                 navController = navController,
                 stockSymbol = stockSymbol
+            )
+        }
+        composable(
+            route = Screen.StockDetailsScreen.route,
+            arguments = listOf(
+                navArgument("stockSymbol") { type = NavType.StringType },
+                navArgument("stockID") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val encodedSymbol = backStackEntry.arguments?.getString("stockSymbol") ?: ""
+            val stockSymbol = URLDecoder.decode(encodedSymbol, "UTF-8")
+
+            val encodedID = backStackEntry.arguments?.getString("stockID") ?: ""
+            val stockID = URLDecoder.decode(encodedID, "UTF-8")
+
+            StockDetailsScreen(
+                stockSymbol = stockSymbol,
+                navController = navController,
+                viewModel = koinViewModel(),
+                stockID = stockID
             )
         }
     }

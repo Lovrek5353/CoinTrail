@@ -79,7 +79,7 @@ fun AssetSearchScreen(
                     Log.d("AssetSearchScreen", "Asset: $asset")
                     AssetSearchItem(
                         asset = asset,
-                        onClick = { navController.navigate(Screen.StockDetailsScreen.createRoute(asset.symbol)) },
+                        onClick = { navController.navigate(Screen.StockDetailsScreen.createRoute(asset.symbol,"")) },
                         onAddToPortfolio = {navController.navigate(Screen.StockEditorScreen.createRoute(asset.symbol))},
                         onAddToWatchlist = {}
                     )
