@@ -4,6 +4,7 @@
         alias(libs.plugins.kotlin.compose)
         id("com.google.gms.google-services")
         id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23" // Match your Kotlin version
+        id("com.google.devtools.ksp") version "2.0.21-1.0.27"
     }
 
     android {
@@ -109,6 +110,13 @@
         androidTestImplementation (libs.androidx.espresso.core)
 
         implementation (libs.androidx.datastore.preferences)
+
+        //for room database
+
+        implementation(libs.androidx.room.ktx)
+        ksp(libs.androidx.room.compiler)
+        implementation(libs.androidx.room.runtime)
+        testImplementation(libs.androidx.room.testing)
 
 
 

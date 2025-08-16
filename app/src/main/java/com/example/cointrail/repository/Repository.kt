@@ -83,6 +83,12 @@ interface Repository {
     fun getStocks(): Flow<List<Stock>>
     fun getStock(stockID: String): Flow<Stock>
 
+    suspend fun updateStockInfo(stockID: String, value: Double)
+
+    fun removeFromFavorite(Stock: AssetSearch)
+    fun addToFavorite(Stock: AssetSearch)
+    fun getFavorites(): Flow<List<AssetSearch>>
+
 
 
     fun deleteData(userID: String?)

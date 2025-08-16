@@ -9,7 +9,7 @@ data class Stock(
     val name: String="",
     val symbol: String="",
     val originalPrice: Double=0.0,
-    val currentStockPrice: Double=0.0, //stock*amount
+    var currentStockPrice: Double=0.0, //stock*amount
     val currentPrice: Double=0.0,
     val amount: Double=0.0,
     val purchaseDate: Timestamp? = null,

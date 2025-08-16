@@ -17,11 +17,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.cointrail.composables.HistoryLineGraph
 import com.example.cointrail.data.Stock
 import com.example.cointrail.viewModels.StocksViewModel
+import java.text.SimpleDateFormat
+import java.util.*
+
+// You may need to add an extension or utility to convert your custom date type to java.util.Date if needed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,7 +60,10 @@ fun StockDetailsScreen(
                         text = stockApi?.name ?: "Loading...",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth(0.7f)
                     )
                 },
                 navigationIcon = {
@@ -99,7 +107,7 @@ fun StockDetailsScreen(
         ) {
             item {
                 if (stockApi != null) {
-                    ModernStockDetailsBody(stockApi = stockApi!!, stockDB = stockDB)
+                    ModernStockDetailsBody(stockApi = stockApi!!, stockDB = stockDB, viewModel=viewModel)
                 } else {
                     Box(
                         modifier = Modifier
@@ -119,7 +127,10 @@ fun StockDetailsScreen(
 }
 
 @Composable
-fun ModernStockDetailsBody(stockApi: Stock, stockDB: Stock?) {
+fun ModernStockDetailsBody(stockApi: Stock, stockDB: Stock?, viewModel: StocksViewModel) {
+    // Define the date formatter
+    val dateFormatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
+
     Column(
         modifier = Modifier.padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -136,24 +147,39 @@ fun ModernStockDetailsBody(stockApi: Stock, stockDB: Stock?) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
+                    Column(Modifier.weight(1f)) {
                         if (!stockApi.symbol.isNullOrBlank()) {
                             Text(
                                 text = stockApi.symbol,
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Black,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.primary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                         if (!stockApi.name.isNullOrBlank()) {
+                            // Optionally: use a smaller font if name is long
+                            val nameTextStyle = if ((stockApi.name?.length ?: 0) > 20)
+                                MaterialTheme.typography.bodyMedium
+                            else
+                                MaterialTheme.typography.bodyLarge
+
                             Text(
                                 text = stockApi.name,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface
+                                style = nameTextStyle,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.fillMaxWidth(0.9f)
                             )
                         }
                     }
-                    Column(horizontalAlignment = Alignment.End) {
+                    Column(
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .wrapContentWidth(Alignment.End)
+                    ) {
                         if (stockApi.currentPrice != 0.0) {
                             Text(
                                 text = "Current",
@@ -177,6 +203,10 @@ fun ModernStockDetailsBody(stockApi: Stock, stockDB: Stock?) {
                     // Total value from DB only if available
                     if (stockDB?.currentStockPrice != null && stockDB.currentStockPrice != 0.0) {
                         Column {
+                            if(stockApi.currentPrice!=stockDB.originalPrice){
+                                stockDB.currentStockPrice=stockApi.currentPrice*stockDB.amount
+                                viewModel.updateStockPrice(stockDB.id.toString(),stockDB.currentStockPrice)
+                            }
                             Text(
                                 text = "Total Value",
                                 style = MaterialTheme.typography.labelSmall,
@@ -222,7 +252,15 @@ fun ModernStockDetailsBody(stockApi: Stock, stockDB: Stock?) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     if (stockDB.amount != 0.0) InfoRow("Shares Owned", "%.2f".format(stockDB.amount))
                     if (stockDB.originalPrice != 0.0) InfoRow("Bought At", "${stockDB.originalPrice} ${stockApi.currency}")
-                    stockDB.purchaseDate?.let { InfoRow("Purchase Date", it.toDate().toString()) }
+                    stockDB.purchaseDate?.let {
+                        val dateStr =
+                            try {
+                                dateFormatter.format(it.toDate()) // if your type is Timestamp or similar, or directly `it` if Date
+                            } catch (e: Exception) {
+                                it.toString() // fallback if conversion fails
+                            }
+                        InfoRow("Purchase Date", dateStr)
+                    }
                     if (stockDB.targetPrice != null && stockDB.targetPrice != 0.0)
                         InfoRow("Target Price", "${stockDB.targetPrice} ${stockApi.currency}")
                     if (stockDB.dividendsReceived != 0.0)

@@ -143,14 +143,15 @@ class StocksViewModel(
             }
         }
     }
-//    fun fetchTab(tabId: String) {
-//        viewModelScope.launch {
-//            repository.getTab(tabId)
-//                .collect { tab ->
-//                    _tab.value = tab
-//                }
-//        }
-//    }
+
+    fun updateStockPrice(stockID: String, newPrice: Double) {
+        viewModelScope.launch {
+            try {
+                repository.updateStockInfo(stockID, newPrice)
+            } catch (e: Exception) {
+            }
+        }
+    }
     sealed class UiEvent {
         data class ShowSnackbar(val message: String) : UiEvent()
         object SubmissionSuccess : UiEvent()

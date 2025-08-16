@@ -12,6 +12,8 @@ import com.example.cointrail.data.User
 import com.example.cointrail.data.toAssetHistory
 import com.example.cointrail.data.toAssetSearch
 import com.example.cointrail.data.toStock
+import com.example.cointrail.data.toStockEntity
+import com.example.cointrail.database.StocksDao
 import com.example.cointrail.network.StockAPI
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
@@ -43,8 +45,10 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
 
-internal class RepositoryImpl(private val stockApi: StockAPI)
-    : Repository
+internal class RepositoryImpl(
+    private val stockApi: StockAPI,
+    private val stockDao: StocksDao
+    ) : Repository
 {
 
 
@@ -927,6 +931,28 @@ internal class RepositoryImpl(private val stockApi: StockAPI)
             )
         }
     }
+
+    override suspend fun updateStockInfo(stockID: String, value: Double) {
+        val docRef=stocksReference.document(stockID)
+
+        val updatedData: MutableMap<String, Any> = hashMapOf(
+            "currentStockPrice" to value
+        )
+        docRef.update(updatedData).await()
+    }
+
+    override fun removeFromFavorite(Stock: AssetSearch) {
+        stockDao.removeStock(Stock.symbol)
+    }
+
+    override fun addToFavorite(Stock: AssetSearch) {
+        stockDao.insertStock(Stock.toStockEntity())
+    }
+
+    override fun getFavorites(): Flow<List<AssetSearch>> {
+        TODO("Not yet implemented")
+    }
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override val stocksSharedFlow: SharedFlow<List<Stock>> =

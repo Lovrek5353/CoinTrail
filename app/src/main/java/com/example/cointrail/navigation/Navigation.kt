@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.cointrail.notification.NotificationViewModel
+import com.example.cointrail.screens.AccountAndNotificationScreen
 import com.example.cointrail.screens.AnalyticsScreen
 import com.example.cointrail.screens.AccountScreen
 import com.example.cointrail.screens.AssetSearchScreen
@@ -301,6 +302,17 @@ fun Navigation(startRoute: String) {
                 navController = navController,
                 viewModel = koinViewModel(),
                 stockID = stockID
+            )
+        }
+        composable(route = Screen.AccountNotificationScreen.route) {
+            AccountAndNotificationScreen(
+                loginViewModel = koinViewModel<LoginViewModel>(),
+                navController = navController,
+                notificationViewModel = koinViewModel<NotificationViewModel>(),
+                onNameEditClick = {
+                    navController.navigate(Screen.AccountEditorScreen.route) {
+                    }
+                }
             )
         }
     }

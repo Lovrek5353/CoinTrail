@@ -40,7 +40,7 @@ fun PortfolioScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.assetSearch),
+                        text = stringResource(id = R.string.assets),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onPrimary
                     )

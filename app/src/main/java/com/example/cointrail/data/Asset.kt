@@ -1,5 +1,6 @@
 package com.example.cointrail.data
 
+import com.example.cointrail.database.StockEntity
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.Timestamp
 
@@ -48,4 +49,18 @@ data class AssetHistory(
 fun BodyItem.toAssetHistory()=AssetHistory(
     date =timestamp_unix,
     price =close
+)
+
+fun AssetSearch.toStockEntity()= StockEntity(
+    symbol = symbol,
+    name = name,
+    exchDisp = exchDisp,
+    typeDispl = typeDispl
+)
+
+fun StockEntity.toAssetSearch()= AssetSearch(
+    symbol=symbol,
+    name=name,
+    exchDisp=exchDisp,
+    typeDispl=typeDispl
 )

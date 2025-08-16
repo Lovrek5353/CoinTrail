@@ -71,4 +71,6 @@ sealed class Screen (val route: String) {
         fun createRoute(stockSymbol: String) =
             "stock_editor_screen/${URLEncoder.encode(stockSymbol, "UTF-8")}"
     }
+
+    data object AccountNotificationScreen: Screen("account_notification_screen")
 }
