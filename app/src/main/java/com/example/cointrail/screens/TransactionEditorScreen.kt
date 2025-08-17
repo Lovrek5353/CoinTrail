@@ -27,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,6 +65,18 @@ fun TransactionEditorScreen(
     var showDatePicker by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf<Category?>(null) }
     val categoryList by viewModel.fetchCategories().collectAsState(initial= emptyList())
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is MainViewModel.UiEvent.SubmissionSuccess -> {
+                    navController.popBackStack() // or navigate("destination_screen")
+                }
+                is MainViewModel.UiEvent.ShowSnackbar -> {
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {

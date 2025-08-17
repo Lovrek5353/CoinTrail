@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.example.cointrail.data.Transaction
+import com.example.cointrail.data.enums.TransactionType
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -291,12 +292,14 @@ class TabsViewModel (
                     amount = amountValue,
                     date = Timestamp(java.util.Date(transactionDateMillis!!)),
                     description = transactionDescriptionString,
-                    categoryId = transactionCategoryID
+                    categoryId = transactionCategoryID,
+                    type = TransactionType.TAB
                 )
 
                 //Add transaction
                 repository.addTransaction(transactionToSave)
                 Log.d("TabsViewModel", "Transaction added: $transactionToSave")
+                _eventFlow.emit(TabsViewModel.UiEvent.SubmissionSuccess)
 
                 //Update balance
                 repository.updateTabBalance(tabId, newbalance)

@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.cointrail.data.SavingPocket
 import com.example.cointrail.data.Transaction
 import com.example.cointrail.data.User
+import com.example.cointrail.data.enums.TransactionType
 import com.example.cointrail.repository.Repository
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -211,9 +212,9 @@ class SavingPocketsViewModel(
                     amount = amountValue,
                     date = Timestamp(Date(transactionDateMillis!!)), // Convert Long to Timestamp here
                     description = transactionDescriptionString,
-                    categoryId = transactionCategoryID // Use the dedicated category state
+                    categoryId = transactionCategoryID, // Use the dedicated category state
+                    type= TransactionType.SAVINGS
                 )
-
                 // 1. Add transaction
                 repository.addSavingPocketTransaction(transactionToSave)
                 Log.d("SavingPocketsViewModel", "Transaction added: $transactionToSave")

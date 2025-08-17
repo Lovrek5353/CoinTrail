@@ -471,6 +471,7 @@ internal class RepositoryImpl(
                 "date" to transaction.date,
                 "categoryId" to transaction.categoryId,
                 "description" to transaction.description,
+                "type" to transaction.type
             )
             transactionsReference.add(data).await()
         } catch (e: Exception){

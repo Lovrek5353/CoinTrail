@@ -39,6 +39,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.navigation.NavController
 import com.example.cointrail.R
 import com.example.cointrail.composables.DatePickerModal
+import com.example.cointrail.viewModels.SavingPocketsViewModel
+import kotlinx.coroutines.flow.collectLatest
 import java.util.Date
 import java.util.Locale
 
@@ -59,6 +61,22 @@ fun CategoryTransactionEditorScreen(
             Log.d("CategoryTransactionEditorScreen", "Calling fetchCategory for: $categoryId")
         }
         viewModel.setTransactionCategory(categoryId)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is SavingPocketsViewModel.UiEvent.SubmissionSuccess -> {
+                    navController.popBackStack() // or navigate("destination_screen")
+                }
+                is SavingPocketsViewModel.UiEvent.ShowSnackbar -> {
+                    // Show Snackbar using a SnackbarHostState if you want
+                }
+
+                is CategoriesViewModel.UiEvent.ShowSnackbar -> TODO()
+                CategoriesViewModel.UiEvent.SubmissionSuccess -> TODO()
+            }
+        }
     }
 
     Scaffold(
