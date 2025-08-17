@@ -43,6 +43,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 
 
 internal class RepositoryImpl(
@@ -941,17 +942,24 @@ internal class RepositoryImpl(
         docRef.update(updatedData).await()
     }
 
-    override fun removeFromFavorite(Stock: AssetSearch) {
+    override suspend fun removeFromFavorite(Stock: AssetSearch) {
         stockDao.removeStock(Stock.symbol)
     }
 
-    override fun addToFavorite(Stock: AssetSearch) {
+    override suspend fun addToFavorite(Stock: AssetSearch) {
         stockDao.insertStock(Stock.toStockEntity())
     }
 
-    override fun getFavorites(): Flow<List<AssetSearch>> {
-        TODO("Not yet implemented")
-    }
+    private val favoriteItemsFlow = stockDao.getStocks()
+        .map { list -> list.map { it.toAssetSearch() } }
+        .shareIn(
+            repositoryScope,
+            SharingStarted.WhileSubscribed(5000),
+            1
+        )
+
+    override fun getFavorites(): Flow<List<AssetSearch>> = favoriteItemsFlow
+
 
 
     @OptIn(ExperimentalCoroutinesApi::class)

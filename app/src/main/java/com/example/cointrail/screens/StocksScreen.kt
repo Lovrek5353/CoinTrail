@@ -87,7 +87,7 @@ fun StocksScreen(
             ActionButtonCard(
                 text = "Watch List",
                 color = MaterialTheme.colorScheme.tertiary,
-                onClick = { /* TODO: navigate to WatchlistScreen */ }
+                onClick = { navController.navigate(Screen.WatchListScreen.route) }
             )
         }
     }

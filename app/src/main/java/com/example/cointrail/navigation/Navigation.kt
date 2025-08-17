@@ -39,6 +39,7 @@ import com.example.cointrail.screens.TabTransactionEditor
 import com.example.cointrail.screens.TabsScreen
 import com.example.cointrail.screens.TransactionEditorScreen
 import com.example.cointrail.screens.UpdateTransactionEditorScreen
+import com.example.cointrail.screens.WatchlistScreen
 import com.example.cointrail.screens.WelcomeScreen
 
 import com.example.cointrail.viewModels.LoginViewModel
@@ -313,6 +314,12 @@ fun Navigation(startRoute: String) {
                     navController.navigate(Screen.AccountEditorScreen.route) {
                     }
                 }
+            )
+        }
+        composable(route = Screen.WatchListScreen.route) {
+            WatchlistScreen(
+                navController = navController,
+                viewModel = koinViewModel<StocksViewModel>()
             )
         }
     }

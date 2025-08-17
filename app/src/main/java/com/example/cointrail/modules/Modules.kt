@@ -4,6 +4,9 @@ import AnalyticsViewModel
 import CategoriesViewModel
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.room.Room
+import com.example.cointrail.database.AppDatabase
+import com.example.cointrail.database.StocksDao
 import com.example.cointrail.network.KtorClient
 import com.example.cointrail.network.StockAPI
 import com.example.cointrail.network.StockAPIImpl
@@ -42,13 +45,24 @@ val notificationModule = module {
 
 val repositoryModule= module{
     single<Repository>{
-        RepositoryImpl(get())
+        RepositoryImpl(get(), get())
     }
 }
 val dataStoreModule = module {
     single {
         androidContext().dataStore
     }
+}
+
+val databaseModule=module{
+    single {
+        Room.databaseBuilder(
+            androidContext(),
+            AppDatabase::class.java,
+            "Stock-Database"
+        ).build()
+    }
+    single <StocksDao> {get<AppDatabase>().stocksDao()}
 }
 
 val viewModelModule= module {
@@ -67,5 +81,5 @@ val httpClientModule = module {
     single { KtorClient.httpClient }
 }
 
-val appModules= listOf(repositoryModule, viewModelModule, httpClientModule, apiModule, notificationModule, dataStoreModule)
+val appModules= listOf(repositoryModule, viewModelModule, httpClientModule, apiModule, notificationModule, dataStoreModule, databaseModule)
 

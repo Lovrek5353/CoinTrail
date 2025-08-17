@@ -98,4 +98,5 @@
     <string name="assets">Assets</string>
     <string name="stockAmount">Stock amount</string>
     <string name="moreOptions">More options</string>
+    <string name="watchlist">Watchlist</string>
 </resources>

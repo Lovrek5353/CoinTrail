@@ -152,6 +152,28 @@ class StocksViewModel(
             }
         }
     }
+
+    val favoriteAssets: StateFlow<List<AssetSearch>> =
+        repository.getFavorites()
+            .stateIn(
+                scope = viewModelScope, // Cancels when ViewModel is cleared
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = emptyList()
+            )
+
+    fun addToFavorite(stock: AssetSearch)
+    {
+        viewModelScope.launch {
+            repository.addToFavorite(stock)
+        }
+    }
+    fun removeFromFavorite(stock: AssetSearch)
+    {
+        viewModelScope.launch {
+            repository.removeFromFavorite(stock)
+        }
+    }
+
     sealed class UiEvent {
         data class ShowSnackbar(val message: String) : UiEvent()
         object SubmissionSuccess : UiEvent()

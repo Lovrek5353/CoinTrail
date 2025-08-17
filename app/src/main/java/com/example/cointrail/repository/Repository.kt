@@ -85,8 +85,8 @@ interface Repository {
 
     suspend fun updateStockInfo(stockID: String, value: Double)
 
-    fun removeFromFavorite(Stock: AssetSearch)
-    fun addToFavorite(Stock: AssetSearch)
+    suspend fun removeFromFavorite(Stock: AssetSearch)
+    suspend fun addToFavorite(Stock: AssetSearch)
     fun getFavorites(): Flow<List<AssetSearch>>
 
 

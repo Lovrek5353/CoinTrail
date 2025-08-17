@@ -1,19 +1,25 @@
 package com.example.cointrail.screens
 
-import AssetSearchItem
-import android.util.Log
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import WatchlistCard
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.cointrail.R
 import com.example.cointrail.navigation.Screen
@@ -21,20 +27,20 @@ import com.example.cointrail.viewModels.StocksViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AssetSearchScreen(
+fun WatchlistScreen(
     navController: NavController,
     viewModel: StocksViewModel,
     modifier: Modifier = Modifier
 ) {
-    val searchResults by viewModel.searchResults.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
+
+    val favoriteAssets by viewModel.favoriteAssets.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.assetSearch),
+                        text = stringResource(id = R.string.watchlist),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -56,34 +62,17 @@ fun AssetSearchScreen(
             )
         },
     ) { innerPadding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { viewModel.updateSearchQuery(it) },
-                label = { Text("Search assets") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp, horizontal = 8.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 8.dp)
-            ) {
-                items(searchResults) { asset ->
-                    Log.d("AssetSearchScreen", "Asset: $asset")
-                    AssetSearchItem(
-                        asset = asset,
-                        onClick = { navController.navigate(Screen.StockDetailsScreen.createRoute(asset.symbol,"")) },
-                        onAddToPortfolio = {navController.navigate(Screen.StockEditorScreen.createRoute(asset.symbol))},
-                        onAddToWatchlist = {viewModel.addToFavorite(asset)}
-                    )
-                }
+            items(favoriteAssets) { asset ->
+                WatchlistCard(
+                    asset = asset,
+                    onClick = {navController.navigate(Screen.StockDetailsScreen.createRoute(asset.symbol, ""))},
+                    onDelete = {viewModel.removeFromFavorite(asset)}
+                )
             }
         }
     }
