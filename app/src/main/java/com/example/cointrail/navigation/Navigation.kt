@@ -195,7 +195,7 @@ fun Navigation(startRoute: String) {
             SignUpScreen(
                 viewModel = koinViewModel<LoginViewModel>(),
                 onSignUpSuccess = {
-                    navController.navigate(Screen.MainScreen.route) {
+                    navController.navigate(Screen.LoginScreen.route) {
                         popUpTo(Screen.SignUpScreen.route) { inclusive = true }
                     }
                 }

@@ -143,10 +143,10 @@ fun TransactionScreen(
                         color = if ((transaction?.type ?: TransactionType.DEPOSIT) == TransactionType.DEPOSIT)
                             Color(0xFF388E3C) else Color(0xFFD32F2F)
                     )
-                    TransactionDetailRow("Category", transaction?.categoryId ?: "No category")
+//                    TransactionDetailRow("Category", transaction?.categoryId ?: "No category")
                     TransactionDetailRow("Type", transaction?.type?.name ?: "No type")
                     TransactionDetailRow("Date", formatDate(transaction?.date))
-                    TransactionDetailRow("User ID", transaction?.userID ?: "No userID")
+//                    TransactionDetailRow("User ID", transaction?.userID ?: "No userID")
                 }
             }
         }

@@ -315,7 +315,7 @@ internal class RepositoryImpl(
         val updatedData: MutableMap<String, Any> = hashMapOf(
             "amount" to transaction.amount,
             "categoryId" to transaction.categoryId,
-            "date" to transaction.date!!, // Ensure non-null if required
+            "date" to transaction.date!!,
             "description" to transaction.description,
            "type" to transaction.type.name,
             "userID" to transaction.userID
@@ -622,15 +622,30 @@ internal class RepositoryImpl(
         awaitClose()
     }
 
-    override suspend fun emailSignUp(email: String, password: String): Result<Unit> {
+    override suspend fun emailSignUp(email: String, password: String, name: String): Result<User> {
         return try {
-            auth.createUserWithEmailAndPassword(email, password).await()
-            Result.success(Unit)
+            // Step 1: Create Firebase Auth user
+            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
+            val firebaseUser = authResult.user ?: throw Exception("User creation failed")
+
+            // Step 2: Create User object without id (Firestore will generate it)
+            val newUser = User(
+                name = name,
+                email = email
+            )
+
+            // Step 3: Add User to Firestore (auto-generated ID)
+            val documentRef = usersReference
+                .add(newUser)
+                .await()
+
+            // Step 4: Return User with Firestore generated id
+            val savedUser = newUser.copy(id = documentRef.id)
+            Result.success(savedUser)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
-
     override suspend fun sendPasswordResetEmail(email: String): Result<Unit> {
         Log.d("RepositoryImpl", "Sending password reset email to: $email")
         return try {
@@ -855,9 +870,9 @@ internal class RepositoryImpl(
             val response = stockApi.getAssetDetails(symbol, type)
             Log.d("Response", response.toString())
             val stock = response.body?.toStock() ?: Stock()
-            Log.d("Stock", stock.toString())
+            Log.d("StockReceived", stock.toString())
             emit(stock)
-            Log.d("StockSent",stock.toString())
+            Log.d("StockMapped",stock.toString())
         }.catch { e ->
             Log.d("ErrorLog", e.toString())
             // Optionally log the error

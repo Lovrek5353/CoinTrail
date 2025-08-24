@@ -57,12 +57,30 @@ class LoginViewModel(var repository: Repository) : ViewModel() {
 
     fun signUp() {
         viewModelScope.launch {
-            // ... your existing signUp logic ...
+            val result = repository.emailSignUp(email, password, name)
+            if (result.isSuccess) {
+                _eventFlow.emit(UiEvent.SignUpSuccess)
+            } else {
+                _eventFlow.emit(UiEvent.ShowSnackbar(result.exceptionOrNull()?.localizedMessage ?: "Sign up failed"))
+            }
         }
     }
 
+
     fun sendPasswordResetEmail() {
-        // ... your existing sendPasswordResetEmail logic ...
+        viewModelScope.launch {
+            Log.d("LoginViewModel", "Sending password reset email to: $forgotEmail")
+            val result = repository.sendPasswordResetEmail(forgotEmail)
+            if (result.isSuccess) {
+                Log.d("LoginViewModel", "Password reset email sent successfully")
+                _eventFlow.emit(UiEvent.ForgotPasswordSuccess)
+                _eventFlow.emit(UiEvent.ShowSnackbar("Password reset email sent"))
+            } else {
+                val errorMsg = result.exceptionOrNull()?.localizedMessage ?: "Unknown error"
+                Log.e("LoginViewModel", "Error sending password reset email: $errorMsg")
+                _eventFlow.emit(UiEvent.ShowSnackbar("Failed to send password reset email: $errorMsg"))
+            }
+        }
     }
 
     fun signOut() {
@@ -87,7 +105,7 @@ class LoginViewModel(var repository: Repository) : ViewModel() {
                 val result = repository.signInWithGoogle(idToken)
                 if (result.isSuccess) {
                     Log.d("LoginViewModel", "Google sign-in successful")
-                    _eventFlow.emit(UiEvent.GoogleSignInSuccess)  // <-- ADD THIS LINE
+                    _eventFlow.emit(UiEvent.GoogleSignInSuccess)
                     _eventFlow.emit(UiEvent.ShowSnackbar("Google sign-in successful!"))
                 } else {
                     Log.w("LoginViewModel", "Google sign-in failed: ${result.exceptionOrNull()?.message}")
@@ -99,8 +117,6 @@ class LoginViewModel(var repository: Repository) : ViewModel() {
             }
         }
     }
-
-
 
     sealed class UiEvent {
         data class ShowSnackbar(val message: String) : UiEvent()

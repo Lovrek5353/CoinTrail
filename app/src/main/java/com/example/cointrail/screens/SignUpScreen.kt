@@ -39,14 +39,14 @@ fun SignUpScreen(
                     snackbarHostState.showSnackbar(event.message)
                 }
                 LoginViewModel.UiEvent.SignUpSuccess -> {
-                    onSignUpSuccess()
+                    onSignUpSuccess() // <-- This should navigate to login screen
                 }
-
                 LoginViewModel.UiEvent.ForgotPasswordSuccess -> {}
                 else -> {}
             }
         }
     }
+
 
 
     Scaffold(

@@ -184,11 +184,6 @@ class SavingPocketsViewModel(
                     Log.d("SavingPocketsViewModel", "Date cannot be empty")
                     return@launch
                 }
-                // Optional: Add validation for transactionCategoryID if it's mandatory
-                // if (transactionCategoryID.isBlank()) {
-                //     _eventFlow.emit(UiEvent.ShowSnackbar("Category cannot be empty"))
-                //     return@launch
-                // }
 
 
                 val currentSavingPocket =

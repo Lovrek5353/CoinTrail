@@ -49,8 +49,8 @@ class StocksViewModel(
     // Expose search results as StateFlow, debounced and reactive
     @OptIn(ExperimentalCoroutinesApi::class)
     val searchResults: StateFlow<List<AssetSearch>> = _searchQuery
-        .debounce(500) // Wait 500ms after last input
-        .filter { it.isNotBlank() } // Ignore empty queries if you want
+        .debounce(500)
+        .filter { it.isNotBlank() }
         .distinctUntilChanged()
         .flatMapLatest { query ->
             repository.searchAssets(query)

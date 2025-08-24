@@ -56,7 +56,7 @@ interface Repository {
 
     fun emailLogin(email: String, password: String): Flow<Result<AuthResult>>
     //fun emailSignUp(email: String, password: String): Flow<Result<AuthResult>>
-    suspend fun emailSignUp(email: String, password: String): Result<Unit>
+    suspend fun emailSignUp(email: String, password: String, name: String): Result<User>
     fun signOut()
 
     suspend fun sendPasswordResetEmail(email: String): Result<Unit>
