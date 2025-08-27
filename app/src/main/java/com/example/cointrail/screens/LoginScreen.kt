@@ -69,18 +69,16 @@ fun LoginScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Initialize GoogleSignInClient (replace with your actual Web Client ID)
     val googleSignInClient = remember {
         GoogleSignIn.getClient(
             context,
             GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("121529732215-9finngvp3oh5ic3rat0ivvgirthmba51.apps.googleusercontent.com")  // <-- Replace with your Web Client ID
+                .requestIdToken("121529732215-9finngvp3oh5ic3rat0ivvgirthmba51.apps.googleusercontent.com")
                 .requestEmail()
                 .build()
         )
     }
 
-    // Launcher for Google Sign-In activity result with logging and snackbar feedback
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -117,7 +115,6 @@ fun LoginScreen(
         }
     }
 
-    // Collect events from ViewModel to show snackbar and navigate on success
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
             when (event) {

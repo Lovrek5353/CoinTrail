@@ -6,7 +6,6 @@ import com.example.cointrail.data.StockResponse
 import com.example.cointrail.data.StockSymbolSearchResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
-import io.ktor.client.request.header
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import com.example.cointrail.network.HTTPRoutes.searchAsset

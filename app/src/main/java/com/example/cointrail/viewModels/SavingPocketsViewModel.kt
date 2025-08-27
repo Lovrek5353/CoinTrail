@@ -25,7 +25,7 @@ class SavingPocketsViewModel(
 ) : ViewModel() {
     val user: StateFlow<User?> = repository.currentUser
 
-    // Input states for SavingPocket creation/editing
+    // Input states for SavingPocket creation
     var nameString by mutableStateOf("")
         private set
     var descriptionString by mutableStateOf("")
@@ -35,7 +35,7 @@ class SavingPocketsViewModel(
     var selectedDateMillis by mutableStateOf<Long?>(null) // Date for SavingPocket
         private set
 
-    // Input states for Transaction - all independent
+    // Input states for Transaction
     var transactionAmountString by mutableStateOf("")
         private set
     var transactionDescriptionString by mutableStateOf("")

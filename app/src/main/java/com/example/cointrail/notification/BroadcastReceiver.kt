@@ -16,13 +16,12 @@ import org.koin.core.component.inject
 import java.util.Calendar
 
 class NotificationBroadcastReceiver : BroadcastReceiver(), KoinComponent {
-    // Inject the preferences repository
+
     private val preferencesRepository: NotificationPreferencesRepository by inject()
 
     override fun onReceive(context: Context, intent: Intent) {
-        // We need to goAsync() because onReceive is on the main thread and we'll do suspend calls
         val pendingResult: PendingResult = goAsync()
-        val coroutineScope = CoroutineScope(Dispatchers.IO) // Use IO dispatcher for disk operations
+        val coroutineScope = CoroutineScope(Dispatchers.IO)
 
         coroutineScope.launch {
             try {
@@ -32,14 +31,13 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), KoinComponent {
                 val lastOpenCalendar = Calendar.getInstance().apply { timeInMillis = lastAppOpenTimestamp }
                 val currentCalendar = Calendar.getInstance().apply { timeInMillis = currentTimestamp }
 
-                // Check if the last app open date is the same as today's date
                 val wasAppOpenedToday = lastOpenCalendar.get(Calendar.YEAR) == currentCalendar.get(Calendar.YEAR) &&
                         lastOpenCalendar.get(Calendar.MONTH) == currentCalendar.get(Calendar.MONTH) &&
                         lastOpenCalendar.get(Calendar.DAY_OF_MONTH) == currentCalendar.get(Calendar.DAY_OF_MONTH)
 
                 if (!wasAppOpenedToday) {
                     Log.d("NotificationReceiver", "Alarm triggered! App NOT opened today. Showing notification.")
-                    withContext(Dispatchers.Main) { // Show notification on Main thread
+                    withContext(Dispatchers.Main) {
                         NotificationUtils.showNotification(context)
                     }
                 } else {
@@ -48,25 +46,19 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), KoinComponent {
             } catch (e: Exception) {
                 Log.e("NotificationReceiver", "Error checking app open status: ${e.message}")
             } finally {
-                pendingResult.finish() // Must call finish() when done with async work
+                pendingResult.finish()
             }
         }
     }
 }
 class BootCompletedReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) { // Corrected method name from onOnReceive to onReceive
+    override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED ) {
             Log.d("BootReceiver", "Device booted. Re-scheduling notifications.")
             val preferencesRepository = NotificationPreferencesRepository(context.dataStore)
             val notificationScheduler = NotificationScheduler()
 
-            // Use a CoroutineScope to launch a suspend function
-            // This is a simplified approach for a BroadcastReceiver.
-            // For more complex background work, consider WorkManager.
-            // Here, we launch a new coroutine on the IO dispatcher.
-            // Note: In a real app, you might want to ensure this doesn't block the main thread
-            // or use a dedicated background service/WorkManager for more robust handling.
-            val scope = (context.applicationContext as? CoinTrailApplication)?.applicationScope ?: return // Changed to CoinTrailApplication
+            val scope = (context.applicationContext as? CoinTrailApplication)?.applicationScope ?: return
             scope.launch {
                 preferencesRepository.notificationEnabledFlow.collect { isEnabled ->
                     if (isEnabled) {
@@ -76,7 +68,6 @@ class BootCompletedReceiver : BroadcastReceiver() {
                     } else {
                         Log.d("BootReceiver", "Notifications disabled, not re-scheduling.")
                     }
-                    // Stop collecting after the first value to avoid continuous re-scheduling
                     cancel()
                 }
             }

@@ -13,7 +13,7 @@ class NotificationViewModel(
     private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
 
-    // StateFlow to expose notification enabled state to UI
+
     val notificationEnabled: StateFlow<Boolean> = preferencesRepository.notificationEnabledFlow
         .stateIn(
             scope = viewModelScope,
@@ -21,15 +21,14 @@ class NotificationViewModel(
             initialValue = false
         )
 
-    // StateFlow to expose notification time to UI
+
     val notificationTime: StateFlow<Pair<Int, Int>> = preferencesRepository.notificationTimeFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = Pair(9, 0) // Default time
+            initialValue = Pair(9, 0)
         )
 
-    // StateFlow to expose light theme enabled state to UI
     val isLightTheme: StateFlow<Boolean> = preferencesRepository.isLightThemeFlow
         .stateIn(
             scope = viewModelScope,
@@ -37,23 +36,12 @@ class NotificationViewModel(
             initialValue = false
         )
 
-    /**
-     * Sets the light theme preference.
-     *
-     * @param isLight True for light mode, false for dark mode.
-     */
     fun setLightTheme(isLight: Boolean) {
         viewModelScope.launch {
             preferencesRepository.setLightTheme(isLight)
         }
     }
 
-    /**
-     * Toggles the notification on/off and schedules/cancels the alarm accordingly.
-     *
-     * @param enabled True to enable, false to disable.
-     * @param context The application context.
-     */
     fun toggleNotification(enabled: Boolean, context: Context) {
         viewModelScope.launch {
             preferencesRepository.setNotificationEnabled(enabled)
@@ -66,13 +54,6 @@ class NotificationViewModel(
         }
     }
 
-    /**
-     * Updates the preferred notification time and re-schedules the alarm if enabled.
-     *
-     * @param hour The new hour.
-     * @param minute The new minute.
-     * @param context The application context.
-     */
     fun updateNotificationTime(hour: Int, minute: Int, context: Context) {
         viewModelScope.launch {
             preferencesRepository.setNotificationTime(hour, minute)

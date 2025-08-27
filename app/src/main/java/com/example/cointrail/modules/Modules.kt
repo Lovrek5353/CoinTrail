@@ -2,8 +2,6 @@ package com.example.cointrail.modules
 
 import AnalyticsViewModel
 import CategoriesViewModel
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import com.example.cointrail.database.AppDatabase
 import com.example.cointrail.database.StocksDao

@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.cointrail.R
 import com.example.cointrail.composables.StockCard
-import com.example.cointrail.data.Stock
 import com.example.cointrail.navigation.Screen
 import com.example.cointrail.viewModels.StocksViewModel
 

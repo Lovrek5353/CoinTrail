@@ -26,14 +26,10 @@
     import androidx.compose.ui.res.stringResource
     import androidx.compose.ui.tooling.preview.Preview
     import androidx.navigation.NavController
-    import androidx.navigation.compose.rememberNavController
     import com.example.cointrail.R
     import com.example.cointrail.composables.SmallTransactionsTable
     import com.example.cointrail.composables.SpendingHistogramGraph
-    import com.example.cointrail.data.dummyCategories
     import com.example.cointrail.navigation.Screen
-    import com.example.cointrail.repository.RepositoryImpl
-    import com.example.cointrail.ui.theme.CoinTrailTheme
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)

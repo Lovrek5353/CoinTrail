@@ -7,4 +7,3 @@ data class User(
     var name: String = "",
     var email: String = "",
 )
-//expand with additional properties for gamification

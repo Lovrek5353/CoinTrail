@@ -4,14 +4,11 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.vector.EmptyPath
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cointrail.data.AssetHistory
 import com.example.cointrail.data.AssetSearch
 import com.example.cointrail.data.Stock
-import com.example.cointrail.data.Tab
 import com.example.cointrail.repository.Repository
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.ExperimentalCoroutinesApi

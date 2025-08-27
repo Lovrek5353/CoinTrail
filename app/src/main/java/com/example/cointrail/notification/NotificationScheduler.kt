@@ -43,12 +43,11 @@ class NotificationScheduler {
 
         Log.d("NotificationScheduler", "Scheduling notification for: ${calendar.time}")
 
-        // Schedule the alarm to repeat daily
-        // RTC_WAKEUP wakes up the device to fire the alarm
+
         alarmManager.setRepeating(
             AlarmManager.RTC_WAKEUP,
             calendar.timeInMillis,
-            AlarmManager.INTERVAL_DAY, // Repeat every day
+            AlarmManager.INTERVAL_DAY,
             pendingIntent
         )
     }
@@ -60,7 +59,7 @@ class NotificationScheduler {
             context,
             Constants.NOTIFICATION_REQUEST_CODE,
             intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_NO_CREATE // Use NO_CREATE to check if it exists
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_NO_CREATE
         )
 
         pendingIntent?.let {

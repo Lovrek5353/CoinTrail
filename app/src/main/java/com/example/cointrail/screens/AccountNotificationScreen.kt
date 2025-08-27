@@ -29,7 +29,6 @@ import com.example.cointrail.navigation.Screen
 import com.example.cointrail.notification.NotificationUtils
 import com.example.cointrail.notification.NotificationViewModel
 import com.example.cointrail.viewModels.LoginViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

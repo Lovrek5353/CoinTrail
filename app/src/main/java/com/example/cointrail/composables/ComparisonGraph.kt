@@ -1,3 +1,5 @@
+package com.example.cointrail.composables
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,15 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.cointrail.data.Transaction
+import com.example.cointrail.data.enums.TransactionType
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -314,16 +315,16 @@ fun CompareTwoMonthsTransactionsChart(
 @Composable
 fun CompareTwoMonthsTransactionsChartPreview() {
     val prevTestTxs = listOf(
-        Transaction("t1", 120.0, "food", null, "", com.example.cointrail.data.enums.TransactionType.WITHDRAWAL, "user1"),
-        Transaction("t2", 80.0, "travel", null, "", com.example.cointrail.data.enums.TransactionType.WITHDRAWAL, "user1"),
-        Transaction("t3", 45.0, "shopping", null, "", com.example.cointrail.data.enums.TransactionType.WITHDRAWAL, "user1"),
-        Transaction("t4", 60.0, "bills", null, "", com.example.cointrail.data.enums.TransactionType.WITHDRAWAL, "user1"),
+        Transaction("t1", 120.0, "food", null, "", TransactionType.WITHDRAWAL, "user1"),
+        Transaction("t2", 80.0, "travel", null, "", TransactionType.WITHDRAWAL, "user1"),
+        Transaction("t3", 45.0, "shopping", null, "", TransactionType.WITHDRAWAL, "user1"),
+        Transaction("t4", 60.0, "bills", null, "", TransactionType.WITHDRAWAL, "user1"),
     )
     val currTestTxs = listOf(
-        Transaction("t5", 200.0, "food", null, "", com.example.cointrail.data.enums.TransactionType.WITHDRAWAL, "user1"),
-        Transaction("t6", 140.0, "travel", null, "", com.example.cointrail.data.enums.TransactionType.WITHDRAWAL, "user1"),
-        Transaction("t7", 65.0, "bills", null, "", com.example.cointrail.data.enums.TransactionType.WITHDRAWAL, "user1"),
-        Transaction("t8", 145.0, "health", null, "", com.example.cointrail.data.enums.TransactionType.WITHDRAWAL, "user1"),
+        Transaction("t5", 200.0, "food", null, "", TransactionType.WITHDRAWAL, "user1"),
+        Transaction("t6", 140.0, "travel", null, "", TransactionType.WITHDRAWAL, "user1"),
+        Transaction("t7", 65.0, "bills", null, "", TransactionType.WITHDRAWAL, "user1"),
+        Transaction("t8", 145.0, "health", null, "", TransactionType.WITHDRAWAL, "user1"),
     )
     val categoryNames = mapOf(
         "food" to "Food",

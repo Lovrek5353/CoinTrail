@@ -26,7 +26,6 @@ import com.example.cointrail.viewModels.StocksViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-// You may need to add an extension or utility to convert your custom date type to java.util.Date if needed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -128,14 +127,12 @@ fun StockDetailsScreen(
 
 @Composable
 fun ModernStockDetailsBody(stockApi: Stock, stockDB: Stock?, viewModel: StocksViewModel) {
-    // Define the date formatter
     val dateFormatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
 
     Column(
         modifier = Modifier.padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        // --- API Main Overview ---
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.large,
@@ -159,7 +156,6 @@ fun ModernStockDetailsBody(stockApi: Stock, stockDB: Stock?, viewModel: StocksVi
                             )
                         }
                         if (!stockApi.name.isNullOrBlank()) {
-                            // Optionally: use a smaller font if name is long
                             val nameTextStyle = if ((stockApi.name?.length ?: 0) > 20)
                                 MaterialTheme.typography.bodyMedium
                             else
@@ -242,7 +238,6 @@ fun ModernStockDetailsBody(stockApi: Stock, stockDB: Stock?, viewModel: StocksVi
             }
         }
 
-        // --- Investment Details (DB only) ---
         if (stockDB != null) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -255,9 +250,9 @@ fun ModernStockDetailsBody(stockApi: Stock, stockDB: Stock?, viewModel: StocksVi
                     stockDB.purchaseDate?.let {
                         val dateStr =
                             try {
-                                dateFormatter.format(it.toDate()) // if your type is Timestamp or similar, or directly `it` if Date
+                                dateFormatter.format(it.toDate())
                             } catch (e: Exception) {
-                                it.toString() // fallback if conversion fails
+                                it.toString()
                             }
                         InfoRow("Purchase Date", dateStr)
                     }
@@ -280,7 +275,6 @@ fun ModernStockDetailsBody(stockApi: Stock, stockDB: Stock?, viewModel: StocksVi
             }
         }
 
-        // --- Notes from DB ---
         if (stockDB?.notes?.isNotBlank() == true) {
             Card(
                 modifier = Modifier.fillMaxWidth(),

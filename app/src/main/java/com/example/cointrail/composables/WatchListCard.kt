@@ -62,7 +62,7 @@ fun WatchlistCard(
 fun WatchlistCardPreview() {
     WatchlistCard(
         asset = AssetSearch(
-            symbol = "AAPL",
+            symbol = "APL",
             name = "Apple Inc.",
             exchDisp = "NASDAQ",
             typeDispl = "Equity"

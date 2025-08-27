@@ -1,8 +1,7 @@
 package com.example.cointrail.screens
 
 import AnalyticsViewModel
-import CompareTwoMonthsTransactionsChart
-import CompareTwoMonthsTransactionsChartPreview
+import com.example.cointrail.composables.CompareTwoMonthsTransactionsChart
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.Box
@@ -31,15 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.cointrail.R
 import com.example.cointrail.composables.CategoryPieChart
-import com.example.cointrail.composables.SpendingLineGraph
 import com.example.cointrail.composables.TransactionsByMonthGraph
-import com.example.cointrail.ui.theme.CoinTrailTheme
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -27,12 +27,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.cointrail.R
 import com.example.cointrail.viewModels.StocksViewModel
-import androidx.compose.material3.OutlinedTextField
-import com.example.cointrail.navigation.Screen
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -32,7 +32,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.example.cointrail.R
-import com.example.cointrail.ui.theme.CoinTrailTheme
 import com.example.cointrail.viewModels.SavingPocketsViewModel
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -40,10 +39,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.composables.DatePickerModal
 import com.example.cointrail.navigation.Screen
-import com.example.cointrail.repository.RepositoryImpl
 import java.util.Date
 import java.util.Locale
 

@@ -39,25 +39,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Get the NotificationPreferencesRepository instance using Koin
         val preferencesRepository: NotificationPreferencesRepository by inject()
 
-        // Launch a coroutine to update the last app open timestamp
         lifecycleScope.launch {
             preferencesRepository.setLastAppOpenTimestamp(System.currentTimeMillis())
             Log.d("MainActivity", "Last app open timestamp updated.")
         }
 
-        // Create Notification Channel (this is fine here)
         NotificationUtils.createNotificationChannel(applicationContext)
 
         setContent {
             var isDarkTheme by remember { mutableStateOf(false) }
 
-            // All @Composable functions must be called within this setContent block
-            // or another @Composable function.
 
-            // 1. Define the permission launcher inside a Composable context
+
             val requestPermissionLauncher = rememberLauncherForActivityResult(
                 ActivityResultContracts.RequestPermission()
             ) { isGranted: Boolean ->
@@ -66,11 +61,9 @@ class MainActivity : ComponentActivity() {
                     // Handle permission grant
                 } else {
                     Log.w("MainActivity", "POST_NOTIFICATIONS permission denied.")
-                    // Explain to the user why the permission is needed
                 }
             }
 
-            // 2. Request permission when the Composable is first launched
             val context = LocalContext.current
             LaunchedEffect(Unit) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -84,13 +77,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            // Koin ViewModel injection is also a Composable call
             val notificationViewModel: NotificationViewModel = koinViewModel()
 
             CoinTrailTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
-                    // Your existing navigation structure
-                    // The paddingValues should ideally be used, e.g., Modifier.padding(paddingValues)
                     Navigation(startRoute = Screen.WelcomeScreen.route)
                 }
             }
