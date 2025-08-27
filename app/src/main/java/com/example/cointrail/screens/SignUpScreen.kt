@@ -1,7 +1,6 @@
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -13,7 +12,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -39,13 +37,14 @@ fun SignUpScreen(
                     snackbarHostState.showSnackbar(event.message)
                 }
                 LoginViewModel.UiEvent.SignUpSuccess -> {
-                    onSignUpSuccess()
+                    onSignUpSuccess() // <-- This should navigate to login screen
                 }
-
                 LoginViewModel.UiEvent.ForgotPasswordSuccess -> {}
+                else -> {}
             }
         }
     }
+
 
 
     Scaffold(

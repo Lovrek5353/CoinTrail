@@ -42,6 +42,7 @@ import com.example.cointrail.R
 import com.example.cointrail.composables.DatePickerModal
 import com.example.cointrail.ui.theme.CoinTrailTheme
 import com.example.cointrail.viewModels.SavingPocketsViewModel
+import kotlinx.coroutines.flow.collectLatest
 import java.util.Date
 import java.util.Locale
 
@@ -70,6 +71,17 @@ fun SavingPocketTransactionEditor(
         }
         // Also set the category ID here, it's safe to do so
         viewModel.setTransactionCategory(savingPocketID)
+    }
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is SavingPocketsViewModel.UiEvent.SubmissionSuccess -> {
+                    navController.popBackStack() // or navigate("destination_screen")
+                }
+                is SavingPocketsViewModel.UiEvent.ShowSnackbar -> {
+                }
+            }
+        }
     }
 
     Scaffold(

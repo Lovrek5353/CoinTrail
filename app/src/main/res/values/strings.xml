@@ -82,4 +82,21 @@
     <string name="initial">initial</string>
     <string name="tabStatus">Tab status</string>
     <string name="updateTransaction">Update a transaction</string>
+    <string name="assetSearch">Asset search</string>
+    <string name="transactions">Transactions</string>
+    <string name="spending_over_time">Spending over time</string>
+    <string name="total_spending_by_category">Total spending by category</string>
+    <string name="Analytics">Analytics</string>
+    <string name="transactionPerType">Total transactions per transaction type</string>
+    <string name="financeManagement">Portfolio comparison</string>
+    <string name="spendingHabitsMonth">Spending habits per month</string>
+    <string name="spendinghabits">Spending habits</string>
+    <string name="sign_out">Sign out</string>
+    <string name="delete_data">Delete account</string>
+    <string name="no_user_found">No user found</string>
+    <string name="default_web_client_id">121529732215-1j9291m50cp60khdv4gr4eh9i2nvb2sk.apps.googleusercontent.com</string>
+    <string name="assets">Assets</string>
+    <string name="stockAmount">Stock amount</string>
+    <string name="moreOptions">More options</string>
+    <string name="watchlist">Watchlist</string>
 </resources>

@@ -42,6 +42,8 @@ import com.example.cointrail.R
 import com.example.cointrail.ui.theme.CoinTrailTheme
 import com.example.cointrail.viewModels.TabsViewModel
 import com.example.cointrail.composables.DatePickerModal
+import com.example.cointrail.viewModels.SavingPocketsViewModel
+import kotlinx.coroutines.flow.collectLatest
 import java.util.Date
 import java.util.Locale
 
@@ -68,6 +70,22 @@ fun TabTransactionEditor(
             viewModel.onTransactionDescriptionChange("Error: Invalid Tab ID") // Or a better error handling
         }
         viewModel.setTransactionCategory(tabID)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is SavingPocketsViewModel.UiEvent.SubmissionSuccess -> {
+                    navController.popBackStack() // or navigate("destination_screen")
+                }
+                is SavingPocketsViewModel.UiEvent.ShowSnackbar -> {
+                    // Show Snackbar using a SnackbarHostState if you want
+                }
+
+                is TabsViewModel.UiEvent.ShowSnackbar -> TODO()
+                TabsViewModel.UiEvent.SubmissionSuccess -> TODO()
+            }
+        }
     }
 
     Scaffold (

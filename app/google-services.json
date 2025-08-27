@@ -12,7 +12,20 @@
           "package_name": "com.example.cointrail"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "121529732215-1j9291m50cp60khdv4gr4eh9i2nvb2sk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cointrail",
+            "certificate_hash": "7c2cf49e904e2b69d66b0f48a8cab79d96c61b2a"
+          }
+        },
+        {
+          "client_id": "121529732215-9finngvp3oh5ic3rat0ivvgirthmba51.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCfdeDKAA3S2Z4QCG-iS4rM_VkwWIhXQ-E"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "121529732215-9finngvp3oh5ic3rat0ivvgirthmba51.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

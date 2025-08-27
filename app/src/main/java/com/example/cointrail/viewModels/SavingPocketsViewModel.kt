@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.cointrail.data.SavingPocket
 import com.example.cointrail.data.Transaction
 import com.example.cointrail.data.User
+import com.example.cointrail.data.enums.TransactionType
 import com.example.cointrail.repository.Repository
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,7 +25,7 @@ class SavingPocketsViewModel(
 ) : ViewModel() {
     val user: StateFlow<User?> = repository.currentUser
 
-    // Input states for SavingPocket creation/editing
+    // Input states for SavingPocket creation
     var nameString by mutableStateOf("")
         private set
     var descriptionString by mutableStateOf("")
@@ -34,7 +35,7 @@ class SavingPocketsViewModel(
     var selectedDateMillis by mutableStateOf<Long?>(null) // Date for SavingPocket
         private set
 
-    // Input states for Transaction - all independent
+    // Input states for Transaction
     var transactionAmountString by mutableStateOf("")
         private set
     var transactionDescriptionString by mutableStateOf("")
@@ -183,11 +184,6 @@ class SavingPocketsViewModel(
                     Log.d("SavingPocketsViewModel", "Date cannot be empty")
                     return@launch
                 }
-                // Optional: Add validation for transactionCategoryID if it's mandatory
-                // if (transactionCategoryID.isBlank()) {
-                //     _eventFlow.emit(UiEvent.ShowSnackbar("Category cannot be empty"))
-                //     return@launch
-                // }
 
 
                 val currentSavingPocket =
@@ -211,9 +207,9 @@ class SavingPocketsViewModel(
                     amount = amountValue,
                     date = Timestamp(Date(transactionDateMillis!!)), // Convert Long to Timestamp here
                     description = transactionDescriptionString,
-                    categoryId = transactionCategoryID // Use the dedicated category state
+                    categoryId = transactionCategoryID, // Use the dedicated category state
+                    type= TransactionType.SAVINGS
                 )
-
                 // 1. Add transaction
                 repository.addSavingPocketTransaction(transactionToSave)
                 Log.d("SavingPocketsViewModel", "Transaction added: $transactionToSave")

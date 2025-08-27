@@ -3,8 +3,6 @@ package com.example.cointrail.screens
 import TabSummary
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -28,13 +26,10 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
 import com.example.cointrail.composables.SmallTransactionsTable
 import com.example.cointrail.composables.SpendingHistogramGraph
 import com.example.cointrail.navigation.Screen
-import com.example.cointrail.repository.RepositoryImpl
-import com.example.cointrail.ui.theme.CoinTrailTheme
 import com.example.cointrail.viewModels.TabsViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -137,13 +132,13 @@ fun TabScreen(
 @Preview
 @Composable
 fun TabScreenPreview(){
-    val viewModel = TabsViewModel(repository = RepositoryImpl())
-    val navController = rememberNavController()
-    CoinTrailTheme {
-        TabScreen(
-            tabID = "1",
-            viewModel = viewModel,
-            navController = navController
-        )
-    }
+//    val viewModel = TabsViewModel(repository = RepositoryImpl())
+//    val navController = rememberNavController()
+//    CoinTrailTheme {
+//        TabScreen(
+//            tabID = "1",
+//            viewModel = viewModel,
+//            navController = navController
+//        )
+//    }
 }

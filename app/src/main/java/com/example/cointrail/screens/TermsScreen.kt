@@ -2,6 +2,7 @@ package com.example.cointrail.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,13 +26,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.cointrail.R
 import com.example.cointrail.ui.theme.CoinTrailTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.dp
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,7 +66,6 @@ fun TermsScreen() {
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             )
-
         }
     ) { innerPadding ->
         LazyColumn(
@@ -75,15 +75,38 @@ fun TermsScreen() {
                 .padding(dimensionResource(id = R.dimen.padding16)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding16))
         ) {
-            // Terms Text
+            // Terms Header
             item {
                 Text(
-                    text = stringResource(id = R.string.terms),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Start
+                    text = "Terms & Conditions",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
+
+            // Dummy Financial Tracking Terms
+            item {
+                Text(
+                    text = "By using CoinTrail, you agree to the following:",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            item {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("• This app helps you track expenses and income but does not provide financial advice.", style = MaterialTheme.typography.bodySmall)
+                    Text("• Data you enter is stored locally on your device and may also be stored in Google Firestore to enable synchronization across devices.", style = MaterialTheme.typography.bodySmall)
+                    Text("• You are responsible for the accuracy of the information you provide.", style = MaterialTheme.typography.bodySmall)
+                    Text("• We do not guarantee investment outcomes or savings results.", style = MaterialTheme.typography.bodySmall)
+                    Text("• Future app updates may introduce new features or modify these terms.", style = MaterialTheme.typography.bodySmall)
+                }
+            }
+
+            // Accept Checkbox
             item {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -126,6 +149,7 @@ fun TermsScreen() {
         }
     }
 }
+
 
 @Preview
 @Composable

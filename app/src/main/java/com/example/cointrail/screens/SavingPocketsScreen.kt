@@ -27,14 +27,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
 import com.example.cointrail.composables.SavingPocketCard
 import com.example.cointrail.navigation.Screen
-import com.example.cointrail.repository.RepositoryImpl
-import com.example.cointrail.ui.theme.CoinTrailTheme
 import com.example.cointrail.viewModels.SavingPocketsViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -105,12 +101,12 @@ fun SavingPocketsScreen(
 @Preview
 @Composable
 fun SavingPocketsScreenPreview(){
-    val viewModel= SavingPocketsViewModel(repository = RepositoryImpl())
-    val navController= rememberNavController()
-    CoinTrailTheme {
-        SavingPocketsScreen(
-            viewModel = viewModel(),
-            navController = navController
-        )
-    }
+//    val viewModel= SavingPocketsViewModel(repository = RepositoryImpl())
+//    val navController= rememberNavController()
+//    CoinTrailTheme {
+//        SavingPocketsScreen(
+//            viewModel = viewModel(),
+//            navController = navController
+//        )
+//    }
 }

@@ -1,7 +1,9 @@
 package com.example.cointrail.navigation
 
+import AnalyticsViewModel
 import CategoriesViewModel
 import CategoryEditorScreen
+import NotificationScreen
 import SignUpScreen
 import TransactionScreen
 import androidx.compose.runtime.Composable
@@ -10,21 +12,34 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.cointrail.notification.NotificationViewModel
+import com.example.cointrail.screens.AccountAndNotificationScreen
+import com.example.cointrail.screens.AnalyticsScreen
+import com.example.cointrail.screens.AccountScreen
+import com.example.cointrail.screens.AssetSearchScreen
 import com.example.cointrail.screens.CategoriesScreen
 import com.example.cointrail.screens.CategoryScreen
 import com.example.cointrail.screens.CategoryTransactionEditorScreen
 import com.example.cointrail.screens.ForgotPasswordScreen
 import com.example.cointrail.screens.LoginScreen
 import com.example.cointrail.screens.MainScreen
+import com.example.cointrail.screens.PortfolioScreen
 import com.example.cointrail.screens.SavingPocketEditorScreen
 import com.example.cointrail.screens.SavingPocketScreen
 import com.example.cointrail.screens.SavingPocketTransactionEditor
 import com.example.cointrail.screens.SavingPocketsScreen
+import com.example.cointrail.screens.StockDetailsScreen
+import com.example.cointrail.screens.StockEditorScreen
+import com.example.cointrail.screens.StocksScreen
 import com.example.cointrail.screens.TabEditorScreen
 import com.example.cointrail.screens.TabScreen
+import com.example.cointrail.screens.TabTransactionEditor
 import com.example.cointrail.screens.TabsScreen
 import com.example.cointrail.screens.TransactionEditorScreen
 import com.example.cointrail.screens.UpdateTransactionEditorScreen
+import com.example.cointrail.screens.WatchlistScreen
+import com.example.cointrail.screens.WelcomeScreen
+
 import com.example.cointrail.viewModels.LoginViewModel
 import com.example.cointrail.viewModels.MainViewModel
 import com.example.cointrail.viewModels.SavingPocketsViewModel
@@ -37,7 +52,6 @@ import java.net.URLDecoder
 @Composable
 fun Navigation(startRoute: String) {
     val navController = rememberNavController()
-
     NavHost(
         navController = navController,
         startDestination = startRoute
@@ -51,7 +65,7 @@ fun Navigation(startRoute: String) {
         composable(route = Screen.LoginScreen.route) {
             LoginScreen(
                 navController = navController,
-                viewModel = koinViewModel<LoginViewModel>()
+               viewModel = koinViewModel<LoginViewModel>()
             )
         }
         composable(route = Screen.CategoriesScreen.route) {
@@ -169,7 +183,7 @@ fun Navigation(startRoute: String) {
         ){
             val encodedId = it.arguments?.getString("tabID") ?: ""
             val tabID = URLDecoder.decode(encodedId, "UTF-8")
-            com.example.cointrail.screens.TabTransactionEditor(
+            TabTransactionEditor(
                 viewModel = koinViewModel<TabsViewModel>(),
                 navController = navController,
                 tabID = tabID
@@ -179,7 +193,7 @@ fun Navigation(startRoute: String) {
             SignUpScreen(
                 viewModel = koinViewModel<LoginViewModel>(),
                 onSignUpSuccess = {
-                    navController.navigate(Screen.MainScreen.route) {
+                    navController.navigate(Screen.LoginScreen.route) {
                         popUpTo(Screen.SignUpScreen.route) { inclusive = true }
                     }
                 }
@@ -206,8 +220,9 @@ fun Navigation(startRoute: String) {
             )
         }
         composable(route = Screen.StocksScreen.route) {
-            com.example.cointrail.screens.StocksScreen(
-                viewModel = koinViewModel<StocksViewModel>()
+            StocksScreen(
+                viewModel = koinViewModel<StocksViewModel>(),
+                navController = navController
             )
         }
         composable(route=Screen.UpdateTransactionEditorScreen.route,
@@ -218,6 +233,91 @@ fun Navigation(startRoute: String) {
                 viewModel = koinViewModel<TransactionViewModel>(),
                 navController = navController,
                 transactionID = transactionID
+            )
+        }
+        composable(route=Screen.AssetSearchScreen.route){
+            AssetSearchScreen(
+                viewModel = koinViewModel<StocksViewModel>(),
+                navController = navController
+            )
+        }
+
+        composable(route=Screen.AnalyticsScreen.route) {
+            AnalyticsScreen(
+                viewModel = koinViewModel<AnalyticsViewModel>(),
+                navController = navController
+            )
+        }
+        composable(route=Screen.AccountScreen.route) {
+            AccountScreen(
+                viewModel = koinViewModel<LoginViewModel>(),
+                navController=navController,
+                onNameEditClick = {
+                    navController.navigate(Screen.AccountEditorScreen.route) {
+                    }
+                }
+            )
+        }
+        composable(route=Screen.PortfolioScreen.route) {
+            PortfolioScreen(
+                navController = navController,
+                viewModel = koinViewModel<StocksViewModel>()
+            )
+        }
+        composable(route=Screen.WelcomeScreen.route) {
+            WelcomeScreen(
+                navController = navController,
+            )
+        }
+        composable(route=Screen.NotificationScreen.route) {
+            NotificationScreen(viewModel = koinViewModel<NotificationViewModel>())
+        }
+        composable(route=Screen.StockEditorScreen.route,
+            arguments = listOf(navArgument("stockSymbol") { type = NavType.StringType })){
+            val encodedId = it.arguments?.getString("stockSymbol") ?: ""
+            val stockSymbol = URLDecoder.decode(encodedId, "UTF-8")
+            StockEditorScreen(
+                viewModel = koinViewModel<StocksViewModel>(),
+                navController = navController,
+                stockSymbol = stockSymbol
+            )
+        }
+        composable(
+            route = Screen.StockDetailsScreen.route,
+            arguments = listOf(
+                navArgument("stockSymbol") { type = NavType.StringType },
+                navArgument("stockID") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val encodedSymbol = backStackEntry.arguments?.getString("stockSymbol") ?: ""
+            val stockSymbol = URLDecoder.decode(encodedSymbol, "UTF-8")
+
+            val encodedID = backStackEntry.arguments?.getString("stockID") ?: ""
+            val stockID = URLDecoder.decode(encodedID, "UTF-8")
+
+            StockDetailsScreen(
+                stockSymbol = stockSymbol,
+                navController = navController,
+                viewModel = koinViewModel(),
+                stockID = stockID
+            )
+        }
+        composable(route = Screen.AccountNotificationScreen.route) {
+            AccountAndNotificationScreen(
+                loginViewModel = koinViewModel<LoginViewModel>(),
+                navController = navController,
+                notificationViewModel = koinViewModel<NotificationViewModel>(),
+                onNameEditClick = {
+                    navController.navigate(Screen.AccountEditorScreen.route) {
+                    }
+                }
+            )
+        }
+        composable(route = Screen.WatchListScreen.route) {
+            WatchlistScreen(
+                navController = navController,
+                viewModel = koinViewModel<StocksViewModel>()
             )
         }
     }

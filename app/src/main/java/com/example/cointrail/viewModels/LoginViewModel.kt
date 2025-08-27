@@ -6,17 +6,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.cointrail.data.User
 import com.example.cointrail.repository.Repository
 import com.google.firebase.auth.AuthResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class LoginViewModel    (var repository: Repository): ViewModel()
-{
+class LoginViewModel(var repository: Repository) : ViewModel() {
+
     var email by mutableStateOf("")
         private set
     var password by mutableStateOf("")
@@ -48,65 +51,85 @@ class LoginViewModel    (var repository: Repository): ViewModel()
         name = newName
     }
 
-    fun onForgotEmailChange(newEmail: String){
-        forgotEmail=newEmail
+    fun onForgotEmailChange(newEmail: String) {
+        forgotEmail = newEmail
     }
 
     fun signUp() {
         viewModelScope.launch {
-            // Validation in ViewModel
-            when {
-                name.isBlank() -> _eventFlow.emit(UiEvent.ShowSnackbar("Name is required"))
-                email.isBlank() -> _eventFlow.emit(UiEvent.ShowSnackbar("Email is required"))
-                password.isBlank() -> _eventFlow.emit(UiEvent.ShowSnackbar("Password is required"))
-                confirmPassword.isBlank() -> _eventFlow.emit(UiEvent.ShowSnackbar("Confirm password is required"))
-                password != confirmPassword -> _eventFlow.emit(UiEvent.ShowSnackbar("Passwords don't match"))
-                else -> {
-                    val result = repository.emailSignUp(email, password)
-                    if (result.isSuccess) {
-                        _eventFlow.emit(UiEvent.ForgotPasswordSuccess)
-                    } else {
-                        _eventFlow.emit(UiEvent.ShowSnackbar(result.exceptionOrNull()?.message ?: "Reset password failed"))
-                    }
-                }
+            val result = repository.emailSignUp(email, password, name)
+            if (result.isSuccess) {
+                _eventFlow.emit(UiEvent.SignUpSuccess)
+            } else {
+                _eventFlow.emit(UiEvent.ShowSnackbar(result.exceptionOrNull()?.localizedMessage ?: "Sign up failed"))
             }
         }
     }
 
+
     fun sendPasswordResetEmail() {
-        Log.d("LoginViewModel", "sendPasswordResetEmail called with email: $forgotEmail")
         viewModelScope.launch {
-            if (forgotEmail.isBlank()) {
-                Log.d("LoginViewModel", "Email is blank")
-                _eventFlow.emit(UiEvent.ShowSnackbar("Email is required"))
-                return@launch
-            }
+            Log.d("LoginViewModel", "Sending password reset email to: $forgotEmail")
             val result = repository.sendPasswordResetEmail(forgotEmail)
             if (result.isSuccess) {
                 Log.d("LoginViewModel", "Password reset email sent successfully")
+                _eventFlow.emit(UiEvent.ForgotPasswordSuccess)
                 _eventFlow.emit(UiEvent.ShowSnackbar("Password reset email sent"))
             } else {
-                Log.d("LoginViewModel", "Failed to send reset email")
-                _eventFlow.emit(
-                    UiEvent.ShowSnackbar(
-                        result.exceptionOrNull()?.message ?: "Failed to send reset email"
-                    )
-                )
+                val errorMsg = result.exceptionOrNull()?.localizedMessage ?: "Unknown error"
+                Log.e("LoginViewModel", "Error sending password reset email: $errorMsg")
+                _eventFlow.emit(UiEvent.ShowSnackbar("Failed to send password reset email: $errorMsg"))
             }
         }
     }
 
-    fun signOut() {  //call this on button click and navigate to login screen in the same Unit
+    fun signOut() {
         repository.signOut()
-        // Optionally emit an event for UI navigation or feedback
+    }
+
+    private val _localUser = MutableStateFlow<User?>(null)
+    val localUser: StateFlow<User?> = _localUser.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            repository.currentUser.collectLatest { user ->
+                _localUser.value = user
+            }
+        }
+    }
+
+    fun signInWithGoogle(idToken: String) {
+        Log.d("LoginViewModel", "Launching signInWithGoogle with ID token")
+        viewModelScope.launch {
+            try {
+                val result = repository.signInWithGoogle(idToken)
+                if (result.isSuccess) {
+                    Log.d("LoginViewModel", "Google sign-in successful")
+                    _eventFlow.emit(UiEvent.GoogleSignInSuccess)
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Google sign-in successful!"))
+                } else {
+                    Log.w("LoginViewModel", "Google sign-in failed: ${result.exceptionOrNull()?.message}")
+                    _eventFlow.emit(UiEvent.ShowSnackbar(result.exceptionOrNull()?.message ?: "Google sign-in failed"))
+                }
+            } catch (e: Exception) {
+                Log.e("LoginViewModel", "Exception during signInWithGoogle coroutine", e)
+                _eventFlow.emit(UiEvent.ShowSnackbar("Sign in error: ${e.message}"))
+            }
+        }
     }
 
     sealed class UiEvent {
         data class ShowSnackbar(val message: String) : UiEvent()
-        data object SignUpSuccess : UiEvent()
-        data object ForgotPasswordSuccess: UiEvent()
+        object GoogleSignInSuccess : UiEvent()
+        object SignUpSuccess : UiEvent()
+        object ForgotPasswordSuccess : UiEvent()
     }
+
     fun emailLogin(email: String, password: String): Flow<Result<AuthResult>> {
         return repository.emailLogin(email, password)
+    }
+
+    fun deleteData(userID: String?) {
+        repository.deleteData(userID)
     }
 }

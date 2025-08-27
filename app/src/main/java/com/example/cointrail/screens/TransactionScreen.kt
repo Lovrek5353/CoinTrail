@@ -9,13 +9,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.cointrail.data.Transaction
 import com.example.cointrail.data.enums.TransactionType
 import com.example.cointrail.navigation.Screen
 import com.example.cointrail.viewModels.TransactionViewModel
@@ -36,7 +33,7 @@ fun TransactionScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    // Collect snackbar events from the ViewModel
+    // Collect snack-bar events from the ViewModel
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
@@ -50,7 +47,12 @@ fun TransactionScreen(
 
     // Load transaction when screen is opened
     LaunchedEffect(categoryID, transactionID) {
-        viewModel.loadTransaction(categoryID, transactionID)
+        if(categoryID=="0"){
+            viewModel.loadSingleTransaction(transactionID)
+        }
+        else{
+            viewModel.loadTransaction(categoryID, transactionID)
+        }
     }
 
     Scaffold(
@@ -138,10 +140,10 @@ fun TransactionScreen(
                         color = if ((transaction?.type ?: TransactionType.DEPOSIT) == TransactionType.DEPOSIT)
                             Color(0xFF388E3C) else Color(0xFFD32F2F)
                     )
-                    TransactionDetailRow("Category", transaction?.categoryId ?: "No category")
+//                    TransactionDetailRow("Category", transaction?.categoryId ?: "No category")
                     TransactionDetailRow("Type", transaction?.type?.name ?: "No type")
                     TransactionDetailRow("Date", formatDate(transaction?.date))
-                    TransactionDetailRow("User ID", transaction?.userID ?: "No userID")
+//                    TransactionDetailRow("User ID", transaction?.userID ?: "No userID")
                 }
             }
         }

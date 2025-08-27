@@ -13,7 +13,6 @@ import kotlinx.serialization.json.Json // Important: For configuring the JSON pa
 
 object KtorClient {
     val httpClient: HttpClient = HttpClient(Android) {
-        // Logging plugin (good for debugging network requests)
         install(Logging) {
             logger = object : Logger {
                 override fun log(message: String) {
@@ -25,24 +24,14 @@ object KtorClient {
         defaultRequest {
             header("x-rapidapi-key", apiKey)
             header("x-rapidapi-host", "yahoo-finance15.p.rapidapi.com")
-            // Add more headers if needed
         }
 
         install(ContentNegotiation) {
-            // Configure JSON serialization using kotlinx.serialization
             json(Json {
-                prettyPrint = true // Makes the JSON output in logs more readable
-                isLenient = true // Allows for some leniency in JSON parsing (e.g., unquoted keys)
-                ignoreUnknownKeys = true // Crucial: Ignores fields in JSON that are not present in your data class
+                prettyPrint = true
+                isLenient = true
+                ignoreUnknownKeys = true
             })
         }
-
-        // Optional: Request timeout configuration
-        // install(HttpTimeout) {
-        //     requestTimeoutMillis = 15000 // 15 seconds
-        //     connectTimeoutMillis = 15000
-        //     socketTimeoutMillis = 15000
-        // }
-
     }
 }

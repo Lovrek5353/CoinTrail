@@ -1,6 +1,5 @@
 package com.example.cointrail.screens
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -33,9 +32,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.cointrail.R
-import com.example.cointrail.navigation.Screen
-import com.example.cointrail.repository.RepositoryImpl
-import com.example.cointrail.ui.theme.CoinTrailTheme
 import com.example.cointrail.viewModels.LoginViewModel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -57,6 +53,7 @@ fun ForgotPasswordScreen(
                     onForgotPasswordClick()
                 }
                 LoginViewModel.UiEvent.SignUpSuccess -> {}
+                else -> {}
             }
         }
     }
@@ -135,12 +132,12 @@ fun ForgotPasswordScreen(
 @Preview
 @Composable
 fun ForgotPasswordScreenPreview(){
-    val viewModel=LoginViewModel(repository = RepositoryImpl())
-    CoinTrailTheme {
-        ForgotPasswordScreen(
-            viewModel = viewModel,
-            onForgotPasswordClick = {}
-        )
-
-    }
+//    val viewModel=LoginViewModel(repository = RepositoryImpl())
+//    CoinTrailTheme {
+//        ForgotPasswordScreen(
+//            viewModel = viewModel,
+//            onForgotPasswordClick = {}
+//        )
+//
+//    }
 }

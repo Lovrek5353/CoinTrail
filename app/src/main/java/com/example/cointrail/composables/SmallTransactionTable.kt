@@ -12,14 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.cointrail.R
 import com.example.cointrail.data.Transaction
-import com.example.cointrail.ui.theme.CoinTrailTheme
 import com.google.firebase.Timestamp
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -121,29 +119,4 @@ private fun Timestamp.toLocalDate(): LocalDate {
     return this.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
 }
 
-@Preview(showBackground = true)
-@Composable
-fun SmallTransactionsTablePreview() {
-    val dummyTransactions = listOf(
-        Transaction(
-            id = "1",
-            date = Timestamp.now(),
-            description = "Coffee",
-            categoryId = "Food",
-            amount = 3.50
-        ),
-        Transaction(
-            id = "2",
-            date = Timestamp.now(),
-            description = "Book",
-            categoryId = "Education",
-            amount = 12.99
-        )
-    )
-    CoinTrailTheme {
-//        SmallTransactionsTable(
-//            transactions = dummyTransactions,
-//            onTransactionClick = {}
-//        )
-    }
-}
+

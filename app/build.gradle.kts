@@ -4,6 +4,7 @@
         alias(libs.plugins.kotlin.compose)
         id("com.google.gms.google-services")
         id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23" // Match your Kotlin version
+        id("com.google.devtools.ksp") version "2.0.21-1.0.27"
     }
 
     android {
@@ -78,7 +79,7 @@
         implementation(platform(libs.firebase.bom.v33150))
         implementation(libs.firebase.auth)
 
-        //implementation (libs.androidx.material.icons.extended)
+        implementation (libs.androidx.material.icons.extended)
 
         // Ktor client core and Android engine
         implementation(platform(libs.ktor.bom))
@@ -92,6 +93,31 @@
         implementation(libs.kotlinx.serialization.json)
 
         implementation(libs.slf4j.android)
+
+        //Google sign in
+        implementation (libs.play.services.auth)
+
+        //For Unit testing
+        testImplementation(libs.junit)
+        testImplementation(libs.mockito.kotlin) // Or the latest version
+        testImplementation(libs.mockito.core) // Or the latest version
+        testImplementation(libs.kotlinx.coroutines.test) // Or the latest version
+        testImplementation(libs.core.ktx) // Or the latest version
+
+        //For Instrumental testing
+        androidTestImplementation (libs.ui.test.junit4)
+        androidTestImplementation (libs.androidx.junit.v115)
+        androidTestImplementation (libs.androidx.espresso.core)
+
+        implementation (libs.androidx.datastore.preferences)
+
+        //for room database
+
+        implementation(libs.androidx.room.ktx)
+        ksp(libs.androidx.room.compiler)
+        implementation(libs.androidx.room.runtime)
+        testImplementation(libs.androidx.room.testing)
+
 
 
         // Add the dependencies for any other desired Firebase products

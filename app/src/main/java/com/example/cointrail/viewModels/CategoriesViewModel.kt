@@ -182,6 +182,7 @@ class CategoriesViewModel(
                 repository.addTransaction(validatedTransaction)
                 Log.d("CategoriesViewModel", "Transaction added successfully")
 
+                _eventFlow.emit(CategoriesViewModel.UiEvent.SubmissionSuccess)
                 //Reset transaction form fields
                 transactionAmountString = ""
                 transactionDescriptionString = ""

@@ -1,10 +1,7 @@
 package com.example.cointrail.screens
 
-import ProgressIndicator
-import android.annotation.SuppressLint
+import com.example.cointrail.composables.ProgressIndicator
 import android.util.Log
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons

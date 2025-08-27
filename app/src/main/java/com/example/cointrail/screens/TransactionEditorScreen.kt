@@ -27,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,17 +41,12 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
 import com.example.cointrail.composables.CategoryDropDownList
 import com.example.cointrail.composables.DatePickerModal
 import com.example.cointrail.data.Category
-import com.example.cointrail.data.dummyCategories
 import com.example.cointrail.data.enums.TransactionType
-import com.example.cointrail.repository.RepositoryImpl
-import com.example.cointrail.ui.theme.CoinTrailTheme
 import com.example.cointrail.viewModels.MainViewModel
-import com.example.cointrail.viewModels.TabsViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -64,6 +60,18 @@ fun TransactionEditorScreen(
     var showDatePicker by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf<Category?>(null) }
     val categoryList by viewModel.fetchCategories().collectAsState(initial= emptyList())
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is MainViewModel.UiEvent.SubmissionSuccess -> {
+                    navController.popBackStack() // or navigate("destination_screen")
+                }
+                is MainViewModel.UiEvent.ShowSnackbar -> {
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -278,9 +286,9 @@ fun TransactionEditorScreen(
 @Preview
 @Composable
 fun TransactionEditorScreenPreview(){
-    val viewModel=MainViewModel(repository = RepositoryImpl())
-    val navController= rememberNavController()
-    CoinTrailTheme {
-        TransactionEditorScreen(viewModel = viewModel, navController = navController)
-    }
+//    val viewModel=MainViewModel(repository = RepositoryImpl())
+//    val navController= rememberNavController()
+//    CoinTrailTheme {
+//        TransactionEditorScreen(viewModel = viewModel, navController = navController)
+//    }
 }

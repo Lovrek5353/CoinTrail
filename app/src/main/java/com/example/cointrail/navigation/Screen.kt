@@ -54,4 +54,25 @@ sealed class Screen (val route: String) {
         fun createRoute(transactionID: String) =
             "update_transaction_editor_screen/${URLEncoder.encode(transactionID, "UTF-8")}"
     }
+    data object AssetSearchScreen: Screen("asset_search_screen")
+
+    data object StockDetailsScreen: Screen("stock_details_screen/{stockSymbol}/{stockID}") {
+        fun createRoute(stockSymbol: String, stockID: String) =
+            "stock_details_screen/${URLEncoder.encode(stockSymbol, "UTF-8")}/${URLEncoder.encode(stockID, "UTF-8")}"
+    }
+    data object AnalyticsScreen: Screen("analytics_screen")
+    data object AccountEditorScreen: Screen("account_editor_screen")
+
+    data object PortfolioScreen: Screen("portfolio")
+
+    data object NotificationScreen: Screen("notification_screen")
+
+    data object StockEditorScreen: Screen("stock_editor_screen/{stockSymbol}") {
+        fun createRoute(stockSymbol: String) =
+            "stock_editor_screen/${URLEncoder.encode(stockSymbol, "UTF-8")}"
+    }
+
+    data object AccountNotificationScreen: Screen("account_notification_screen")
+
+    data object WatchListScreen: Screen("watchlist_screen")
 }

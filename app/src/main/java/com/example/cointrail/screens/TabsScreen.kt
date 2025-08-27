@@ -29,12 +29,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.cointrail.R
 import com.example.cointrail.composables.TabCard
 import com.example.cointrail.navigation.Screen
-import com.example.cointrail.repository.RepositoryImpl
-import com.example.cointrail.ui.theme.CoinTrailTheme
 import com.example.cointrail.viewModels.TabsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,12 +103,12 @@ fun TabsScreen(
 @Preview
 @Composable
 fun TabsScreenPreview(){
-    val viewModel = TabsViewModel(repository = RepositoryImpl())
-    val navController= rememberNavController()
-    CoinTrailTheme {
-        TabsScreen(
-            navController=navController,
-            viewModel = viewModel
-        )
-    }
+//    val viewModel = TabsViewModel(repository = RepositoryImpl())
+//    val navController= rememberNavController()
+//    CoinTrailTheme {
+//        TabsScreen(
+//            navController=navController,
+//            viewModel = viewModel
+//        )
+//    }
 }
